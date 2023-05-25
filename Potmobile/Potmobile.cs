@@ -45,8 +45,8 @@ namespace Potmobile
             cb.levelArmor = 0f;
             cb.baseRegen = 1f;
             cb.levelRegen = 0.2f;
-            cb.baseDamage = 15f;
-            cb.levelDamage = 3f;
+            cb.baseDamage = 12f;
+            cb.levelDamage = 2.4f;
 
             #region hurtbox
             HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();

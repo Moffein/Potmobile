@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using RoR2.Skills;
 using System.Collections;
+using RoR2;
+
 namespace Potmobile
 {
     public class PotmobileContent : IContentPackProvider

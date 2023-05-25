@@ -20,10 +20,10 @@ namespace Potmobile
 
             SkillLocator skillLocator = PotmobileContent.PotmobileBodyObject.GetComponent<SkillLocator>();
             BuildPrimary(skillLocator);
+            BuildUtility(skillLocator);
 
             SkillDef filler = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Heretic/HereticDefaultAbility.asset").WaitForCompletion();
             AddSkillToFamily(skillLocator.secondary.skillFamily, filler);
-            AddSkillToFamily(skillLocator.utility.skillFamily, filler);
             AddSkillToFamily(skillLocator.special.skillFamily, filler);
         }
 
@@ -65,6 +65,35 @@ namespace Potmobile
             pie.bonusBlastForce = Vector3.zero;
             PotmobileContent.projectilePrefabs.Add(projectilePrefab);
             EntityStates.MoffeinPotmobile.Weapon.FireCannon.projectilePrefab = projectilePrefab;
+        }
+
+        private static void BuildUtility(SkillLocator skillLocator)
+        {
+            SkillDef utilityDef = SkillDef.CreateInstance<SkillDef>();
+            utilityDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Boost.Boost));
+            utilityDef.baseRechargeInterval = 8f;
+            utilityDef.skillNameToken = "MOFFEINPOTMOBILE_UTILITY_NAME";
+            utilityDef.skillDescriptionToken = "MOFFEINPOTMOBILE_UTILITY_DESC";
+            utilityDef.skillName = "Boost";
+            utilityDef.icon = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Toolbot/ToolbotBodyToolbotDash.asset").WaitForCompletion().icon;
+            utilityDef.baseMaxStock = 1;
+            utilityDef.rechargeStock = 1;
+            utilityDef.beginSkillCooldownOnSkillEnd = true;
+            utilityDef.activationStateMachineName = "Boost";
+            utilityDef.interruptPriority = InterruptPriority.Any;
+            utilityDef.isCombatSkill = false;
+            utilityDef.cancelSprintingOnActivation = false;
+            utilityDef.canceledFromSprinting = false;
+            utilityDef.mustKeyPress = false;
+            utilityDef.requiredStock = 1;
+            utilityDef.stockToConsume = 1;
+            utilityDef.keywordTokens = new string[] { "KEYWORD_STUNNING" };
+            (utilityDef as ScriptableObject).name = utilityDef.skillName;
+
+            PotmobileContent.skillDefs.Add(utilityDef);
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Boost.Boost));
+            AddSkillToFamily(skillLocator.utility.skillFamily, utilityDef);
+            PotmobileContent.SkillDefs.Boost = utilityDef;
         }
 
         private static void CreateSkillFamilies(GameObject targetPrefab, bool destroyExisting = true)

@@ -1,0 +1,67 @@
+﻿using UnityEngine;
+using RoR2;
+using UnityEngine.Networking;
+
+namespace EntityStates.MoffeinPotmobile.Boost
+{
+    public class Boost : BaseState
+    {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Util.PlaySound("Play_MULT_shift_start", base.gameObject);
+            trailStopwatch = 0f;
+
+            hvm = base.GetComponent<HoverVehicleMotor>();
+            if (hvm)
+            {
+                origMotorForce = hvm.motorForce;
+                hvm.motorForce = origMotorForce * forceMultiplier;
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            trailStopwatch += Time.fixedDeltaTime;
+            if (this.trailStopwatch >= trailTime)
+            {
+                EffectManager.SpawnEffect(trailPrefab, new EffectData
+                {
+                    origin = base.transform.position - base.transform.forward
+                }, false);
+                this.trailStopwatch -= trailTime;
+            }
+            if (base.isAuthority && base.fixedAge >= baseDuration)
+            {
+                this.outer.SetNextStateToMain();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            if (hvm)
+            {
+                hvm.motorForce = origMotorForce;
+            }
+            Util.PlaySound("Play_MULT_shift_end", base.gameObject);
+            base.OnExit();
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+
+        private HoverVehicleMotor hvm;
+        private float origMotorForce;
+        public static float baseDuration = 2.5f;
+        public static float forceMultiplier = 2f;
+
+        public static GameObject trailPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/missileexplosionvfx");
+        public static float trailFrequency = 8f;
+        private float trailStopwatch;
+        private float trailTime;
+    }
+}
