@@ -35,7 +35,7 @@ namespace EntityStates.MoffeinPotmobile.Weapon
         }
 
         public static GameObject projectilePrefab;
-        public static float damageCoefficient = 12f;
+        public static float damageCoefficient = 10f;
         public static float force = 2500f;
         public static float baseDuration = 1.5f;
         private float duration;

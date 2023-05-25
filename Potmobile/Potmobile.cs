@@ -29,40 +29,75 @@ namespace Potmobile
         {
             if (PotmobileContent.PotmobileBodyObject) return;
 
-            //Mapzone teleports gameobjects on layer 0
-            /*On.RoR2.MapZone.TryZoneStart += (orig, self, other) =>
-            {
-                Debug.Log(other.gameObject.layer);
-                orig(self, other);
-            };*/
-
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileBody", true);
 
             //Fix Out of Bounds teleport
-            /*Debug.Log("Commando Layer: " + Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoBody.prefab").WaitForCompletion().layer);    //0
-            Debug.Log("Potmobile Layer: " + PotmobileBodyObject.layer); //17
-            Debug.Log("Player Layer: " + LayerIndex.playerBody.intVal); //22
-            */
-            PotmobileContent.PotmobileBodyObject.layer = 0;
+            bodyObject.layer = 0;
 
-            CharacterBody cb = PotmobileContent.PotmobileBodyObject.GetComponent<CharacterBody>();
+            CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
             cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
 
-            //Lower max health and add armor, keeps EHP the same but makes flat healing items a bit better.
-            cb.baseMaxHealth = 480f;
+            cb.baseMaxHealth = 480;
             cb.levelMaxHealth = 144f;
             cb.baseArmor = 25f;
+            cb.levelArmor = 0f;
+            cb.baseRegen = 1f;
+            cb.levelRegen = 0.2f;
+            cb.baseDamage = 15f;
+            cb.levelDamage = 3f;
 
+            #region hurtbox
+            HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();
+            for (int i = 0; i < existingHurtboxes.Length; i++)
+            {
+                Destroy(existingHurtboxes[i]);
+            }
+            HurtBoxGroup existingHBG = bodyObject.GetComponentInChildren<HurtBoxGroup>();
+            if (existingHBG) Destroy(existingHBG);
 
+            ModelLocator modelLocator = bodyObject.GetComponent<ModelLocator>();
+            modelLocator.modelTransform.gameObject.layer = LayerIndex.entityPrecise.intVal;
+
+            GameObject hbObject = modelLocator.modelTransform.gameObject;
+            BoxCollider bc = hbObject.AddComponent<BoxCollider>();
+            bc.center = new Vector3(0f, 0f, 0f);
+            bc.size = new Vector3(3.8f, 1.1f, 3.8f);
+            HurtBoxGroup goHurtBoxGroup = hbObject.AddComponent<HurtBoxGroup>();
+
+            HurtBox goHurtBox = hbObject.AddComponent<HurtBox>();
+            goHurtBox.isBullseye = true;
+            goHurtBox.isSniperTarget = true;
+            goHurtBox.healthComponent = bodyObject.GetComponent<HealthComponent>();
+            goHurtBox.damageModifier = HurtBox.DamageModifier.Normal;
+            goHurtBox.hurtBoxGroup = goHurtBoxGroup;
+            goHurtBox.indexInGroup = 0;
+
+            HurtBox[] goHurtBoxArray = new HurtBox[]
+            {
+                goHurtBox
+            };
+
+            goHurtBoxGroup.bullseyeCount = 1;
+            goHurtBoxGroup.hurtBoxes = goHurtBoxArray;
+            goHurtBoxGroup.mainHurtBox = goHurtBox;
+            #endregion
+
+            #region statemachines
             NetworkStateMachine nsm = bodyObject.GetComponent<NetworkStateMachine>();
+            if (!nsm)
+            {
+                nsm = bodyObject.AddComponent<NetworkStateMachine>();
+                nsm.stateMachines = bodyObject.GetComponents<EntityStateMachine>();
+            }
 
             EntityStateMachine boostMachine = bodyObject.AddComponent<EntityStateMachine>();
             boostMachine.customName = "Boost";
             boostMachine.initialStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
             boostMachine.mainStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
             nsm.stateMachines.Append(boostMachine).ToArray();
+            #endregion
 
             PotmobileContent.PotmobileBodyObject = bodyObject;
         }
