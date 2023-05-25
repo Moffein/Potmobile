@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32228.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Potmobile", "Potmobile\Potmobile.csproj", "{99712C77-E912-4078-955A-C916CDCA2A54}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{99712C77-E912-4078-955A-C916CDCA2A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99712C77-E912-4078-955A-C916CDCA2A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99712C77-E912-4078-955A-C916CDCA2A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99712C77-E912-4078-955A-C916CDCA2A54}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E8FF4FB9-D5BE-41C2-9267-0CC3A46D6D27}
+	EndGlobalSection
+EndGlobal
