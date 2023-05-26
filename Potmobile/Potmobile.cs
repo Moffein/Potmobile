@@ -26,6 +26,7 @@ namespace Potmobile
         public static float sortPosition = 9999f;
         public static string stages = string.Empty;
         public static List<StageSpawnInfo> StageList = new List<StageSpawnInfo>();
+        public static bool fixJumpPad = true;
 
         public void Awake()
         {
@@ -38,12 +39,15 @@ namespace Potmobile
             SkillSetup.Init();
             MasterSetup.Init();
             EnemySetup.Init();
+            FixJumpPad();
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
         }
 
         private void ReadConfig()
         {
+            fixJumpPad = base.Config.Bind<bool>(new ConfigDefinition("General", "Fix Jump Pads"), true, new ConfigDescription("Fixes Potmobiles ignoring jump pads.")).Value;
+
             sortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position"), 9999f, new ConfigDescription("Position in the Survivor Select menu.")).Value;
             GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), true, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
 
@@ -166,14 +170,19 @@ namespace Potmobile
             #endregion
 
             //Fix freeze nullref spam
-            if (!bodyObject.GetComponent<SetStateOnHurt>())
-            {
-                SetStateOnHurt ssoh = bodyObject.AddComponent<SetStateOnHurt>();
-                ssoh.canBeFrozen = false;   //setting this to true doesnt seem to enable freezing, so I'll just leave it off
-                ssoh.canBeHitStunned = false;
-                ssoh.canBeStunned = false;
-                ssoh.idleStateMachine = new EntityStateMachine[] { EntityStateMachine.FindByCustomName(bodyObject, "Body"), EntityStateMachine.FindByCustomName(bodyObject, "Weapon"), boostMachine };
-            }
+            SetStateOnHurt ssoh = bodyObject.AddComponent<SetStateOnHurt>();
+            ssoh.canBeFrozen = true;
+            ssoh.canBeHitStunned = false;
+            ssoh.canBeStunned = false;
+            ssoh.idleStateMachine = new EntityStateMachine[] { EntityStateMachine.FindByCustomName(bodyObject, "Weapon"), boostMachine };
+            ssoh.targetStateMachine = EntityStateMachine.FindByCustomName(bodyObject, "Body");
+
+            //Fix Potmobiles living after death
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.PotmobileDeath));
+            CharacterDeathBehavior cdb = bodyObject.AddComponent<CharacterDeathBehavior>();
+            cdb.deathState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.PotmobileDeath));
+            cdb.deathStateMachine = ssoh.targetStateMachine;
+            cdb.idleStateMachine = ssoh.idleStateMachine;
 
             PotmobileContent.PotmobileBodyObject = bodyObject;
         }
@@ -197,10 +206,25 @@ namespace Potmobile
             PotmobileContent.PotmobileSurvivorDef = sd;
         }
 
+        private void FixJumpPad()
+        {
+            if (!fixJumpPad) return;
+
+            On.RoR2.JumpVolume.OnTriggerStay += JumpPadFix;
+        }
+
+        private void JumpPadFix(On.RoR2.JumpVolume.orig_OnTriggerStay orig, JumpVolume self, Collider other)
+        {
+            orig(self, other);
+
+
+        }
+
         private void ContentManager_collectContentPackProviders(RoR2.ContentManagement.ContentManager.AddContentPackProviderDelegate addContentPackProvider)
         {
             addContentPackProvider(new PotmobileContent());
         }
+
         public class StageSpawnInfo
         {
             private string stageName;
