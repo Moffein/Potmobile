@@ -19,9 +19,9 @@ namespace EntityStates.MoffeinPotmobile
                 d.duration = 0.1f;
                 d.enabled = true;
             }
-            DestroyOnTimer d2 = base.gameObject.AddComponent<DestroyOnTimer>();
+            /*DestroyOnTimer d2 = base.gameObject.AddComponent<DestroyOnTimer>();
             d2.duration = 0.1f;
-            d2.enabled = true;
+            d2.enabled = true;*/
         }
     }
 }
