@@ -21,10 +21,10 @@ namespace Potmobile
             SkillLocator skillLocator = PotmobileContent.PotmobileBodyObject.GetComponent<SkillLocator>();
             BuildPrimary(skillLocator);
             BuildUtility(skillLocator);
+            BuildSpecial(skillLocator);
 
             SkillDef filler = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Heretic/HereticDefaultAbility.asset").WaitForCompletion();
             AddSkillToFamily(skillLocator.secondary.skillFamily, filler);
-            AddSkillToFamily(skillLocator.special.skillFamily, filler);
         }
 
 
@@ -87,13 +87,42 @@ namespace Potmobile
             utilityDef.mustKeyPress = false;
             utilityDef.requiredStock = 1;
             utilityDef.stockToConsume = 1;
-            utilityDef.keywordTokens = new string[] { "KEYWORD_STUNNING" };
+            utilityDef.keywordTokens = new string[] { };
             (utilityDef as ScriptableObject).name = utilityDef.skillName;
 
             PotmobileContent.skillDefs.Add(utilityDef);
             PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Boost.Boost));
             AddSkillToFamily(skillLocator.utility.skillFamily, utilityDef);
             PotmobileContent.SkillDefs.Boost = utilityDef;
+        }
+
+        private static void BuildSpecial(SkillLocator skillLocator)
+        {
+            SkillDef specialDef = SkillDef.CreateInstance<SkillDef>();
+            specialDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Boost.Reset));
+            specialDef.baseRechargeInterval = 5f;
+            specialDef.skillNameToken = "MOFFEINPOTMOBILE_SPECIAL_NAME";
+            specialDef.skillDescriptionToken = "MOFFEINPOTMOBILE_SPECIAL_DESC";
+            specialDef.skillName = "Boost";
+            specialDef.icon = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Toolbot/ToolbotBodySwap.asset").WaitForCompletion().icon;
+            specialDef.baseMaxStock = 1;
+            specialDef.rechargeStock = 1;
+            specialDef.beginSkillCooldownOnSkillEnd = true;
+            specialDef.activationStateMachineName = "Boost";
+            specialDef.interruptPriority = InterruptPriority.Skill;
+            specialDef.isCombatSkill = false;
+            specialDef.cancelSprintingOnActivation = false;
+            specialDef.canceledFromSprinting = false;
+            specialDef.mustKeyPress = true;
+            specialDef.requiredStock = 1;
+            specialDef.stockToConsume = 1;
+            specialDef.keywordTokens = new string[] { };
+            (specialDef as ScriptableObject).name = specialDef.skillName;
+
+            PotmobileContent.skillDefs.Add(specialDef);
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Boost.Reset));
+            AddSkillToFamily(skillLocator.special.skillFamily, specialDef);
+            PotmobileContent.SkillDefs.Reset = specialDef;
         }
 
         private static void CreateSkillFamilies(GameObject targetPrefab, bool destroyExisting = true)

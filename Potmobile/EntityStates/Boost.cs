@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using RoR2;
 using UnityEngine.Networking;
+using Potmobile.Components;
 
 namespace EntityStates.MoffeinPotmobile.Boost
 {
@@ -12,11 +13,10 @@ namespace EntityStates.MoffeinPotmobile.Boost
             Util.PlaySound("Play_MULT_shift_start", base.gameObject);
             trailStopwatch = 0f;
 
-            hvm = base.GetComponent<HoverVehicleMotor>();
-            if (hvm)
+            speedController = base.GetComponent<SpeedController>();
+            if (speedController)
             {
-                origMotorForce = hvm.motorForce;
-                hvm.motorForce = origMotorForce * forceMultiplier;
+                speedController.speedMult *= forceMultiplier;
             }
         }
 
@@ -41,9 +41,9 @@ namespace EntityStates.MoffeinPotmobile.Boost
 
         public override void OnExit()
         {
-            if (hvm)
+            if (speedController)
             {
-                hvm.motorForce = origMotorForce;
+                speedController.speedMult /= forceMultiplier;
             }
             Util.PlaySound("Play_MULT_shift_end", base.gameObject);
             base.OnExit();
@@ -54,7 +54,7 @@ namespace EntityStates.MoffeinPotmobile.Boost
             return InterruptPriority.Skill;
         }
 
-        private HoverVehicleMotor hvm;
+        private SpeedController speedController;
         private float origMotorForce;
         public static float baseDuration = 2.5f;
         public static float forceMultiplier = 2f;

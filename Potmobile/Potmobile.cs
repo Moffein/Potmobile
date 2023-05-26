@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using EntityStates;
+using Potmobile.Components;
 using R2API;
 using R2API.Utils;
 using RoR2;
@@ -30,6 +31,8 @@ namespace Potmobile
             if (PotmobileContent.PotmobileBodyObject) return;
 
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileBody", true);
+
+            SpeedController sc = bodyObject.AddComponent<SpeedController>();
 
             //Fix Out of Bounds teleport
             bodyObject.layer = 0;
