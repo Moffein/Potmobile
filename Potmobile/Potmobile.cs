@@ -50,6 +50,7 @@ namespace Potmobile
 
             sortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position"), 9999f, new ConfigDescription("Position in the Survivor Select menu.")).Value;
             GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), false, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.FireCannon.enableICBMSynergy = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Primary ICBM Synergy"), true, new ConfigDescription("Primary is affected by ICBM.")).Value;
 
             EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles to the enemy spawn pool.")).Value;
             EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles to the Dissonance spawn pool if the enemy is enabled.")).Value;
