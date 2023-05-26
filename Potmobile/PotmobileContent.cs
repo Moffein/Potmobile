@@ -5,6 +5,7 @@ using UnityEngine;
 using RoR2.Skills;
 using System.Collections;
 using RoR2;
+using R2API;
 
 namespace Potmobile
 {
@@ -15,6 +16,8 @@ namespace Potmobile
         public static GameObject PotmobileBodyObject;
         public static GameObject PotmobileMasterObject;
         public static BodyIndex PotmobileBodyIndex = BodyIndex.None;
+        public static DirectorAPI.DirectorCardHolder PotmobileCard;
+        public static DirectorAPI.DirectorCardHolder PotmobileLoopCard;
 
         public static List<SkillFamily> skillFamilies = new List<SkillFamily>();
         public static List<SkillDef> skillDefs = new List<SkillDef>();

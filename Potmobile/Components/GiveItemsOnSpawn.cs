@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace Potmobile.Components
 {
-    public class GiveOOBItem : MonoBehaviour
+    public class GiveItemsOnSpawn : MonoBehaviour
     {
+        public static bool giveVase = true;
         public void Start()
         {
             CharacterBody cb = base.GetComponent<CharacterBody>();
@@ -13,6 +14,11 @@ namespace Potmobile.Components
                 if (cb.inventory.GetItemCount(RoR2Content.Items.TeleportWhenOob) <= 0)
                 {
                     cb.inventory.GiveItem(RoR2Content.Items.TeleportWhenOob);
+                }
+
+                if (giveVase && cb.inventory.currentEquipmentIndex == EquipmentIndex.None)
+                {
+                    cb.inventory.SetEquipmentIndex(RoR2Content.Equipment.Gateway.equipmentIndex);
                 }
             }
         }

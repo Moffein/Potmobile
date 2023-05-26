@@ -1,9 +1,11 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using EntityStates;
 using Potmobile.Components;
 using R2API;
 using R2API.Utils;
 using RoR2;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -13,6 +15,7 @@ namespace Potmobile
 {
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.bepis.r2api.prefab")]
+    [BepInDependency("com.bepis.r2api.director")]
     [BepInDependency("com.bepis.r2api.damagetype")]
     [BepInDependency("com.bepis.r2api.recalculatestats")]
     [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.0.0")]
@@ -20,7 +23,10 @@ namespace Potmobile
     public class Potmobile : BaseUnityPlugin
     {
         public static PluginInfo pluginInfo;
-        private static float sortPosition = 9999f;
+        public static float sortPosition = 9999f;
+        public static string stages = string.Empty;
+        public static List<StageSpawnInfo> StageList = new List<StageSpawnInfo>();
+
         public void Awake()
         {
             pluginInfo = Info;
@@ -38,12 +44,36 @@ namespace Potmobile
 
         private void ReadConfig()
         {
+            sortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position"), 9999f, new ConfigDescription("Position in the Survivor Select menu.")).Value;
+            GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), true, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
 
+            EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles to the enemy spawn pool.")).Value;
+            EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles to the Dissonance spawn pool if the enemy is enabled.")).Value;
+            EnemySetup.nerfEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Enemy"), true, new ConfigDescription("Nerfs NPC Potmobiles so they don't instakill you.")).Value;
+            stages = base.Config.Bind<string>(new ConfigDefinition("Enemy", "Stage List"), "golemplains - loop, itgolemplains, goolake, itgoolake, frozenwall, itfrozenwall, snowyforest - loop, goldshores, drybasin, forgottenhaven", new ConfigDescription("What stages the monster will show up on. Add a '- loop' after the stagename to make it only spawn after looping. List of stage names can be found at https://github.com/risk-of-thunder/R2Wiki/wiki/List-of-scene-names")).Value;
+
+            //parse stage
+            stages = new string(stages.ToCharArray().Where(c => !System.Char.IsWhiteSpace(c)).ToArray());
+            string[] splitStages = stages.Split(',');
+            foreach (string str in splitStages)
+            {
+                string[] current = str.Split('-');
+
+                string name = current[0];
+                int minStages = 0;
+                if (current.Length > 1)
+                {
+                    minStages = 5;
+                }
+
+                StageList.Add(new StageSpawnInfo(name, minStages));
+            }
         }
 
         private void LateSetup()
         {
             PotmobileContent.PotmobileBodyIndex = BodyCatalog.FindBodyIndex("MoffeinPotmobileBody");
+            EnemySetup.SetSpawns(); //Run this here after all the custom stages have been loaded.
         }
 
         private void BuildBodyObject()
@@ -54,7 +84,7 @@ namespace Potmobile
 
             bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
-            bodyObject.AddComponent<GiveOOBItem>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
+            bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
 
             //Fix interactor
             Interactor interactor = bodyObject.AddComponent<Interactor>();
@@ -67,14 +97,14 @@ namespace Potmobile
             bodyObject.layer = 0;
 
             CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
-            cb.bodyColor = new Color32(200, 200, 200, 255);
+            cb.bodyColor = new Color32(220, 220, 200, 255);
             cb.name = "MoffeinPotmobileBody";
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
             cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
 
-            cb.baseNameToken = "MOFFEINPOTMOBILE_BODY_NAME";
-            cb.subtitleNameToken = "MOFFEINPOTMOBILE_BODY_SUBTITLE";
+            cb.baseNameToken = "MOFFEINPOTMOBILEBODY_NAME";
+            cb.subtitleNameToken = "MOFFEINPOTMOBILEBODY_SUBTITLE";
             cb.baseMaxHealth = 480f;
             cb.levelMaxHealth = 144f;
             cb.baseArmor =  0;
@@ -159,9 +189,10 @@ namespace Potmobile
             sd.bodyPrefab = PotmobileContent.PotmobileBodyObject;
             sd.hidden = false;
             sd.desiredSortPosition = sortPosition;
-            sd.descriptionToken = "MOFFEINPOTMOBILE_BODY_DESCRIPTION";
+            sd.descriptionToken = "MOFFEINPOTMOBILEBODY_DESCRIPTION";
             sd.displayPrefab = displayObject;
-            sd.mainEndingEscapeFailureFlavorToken = "MOFFEINPOTMOBILE_BODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";
+            sd.mainEndingEscapeFailureFlavorToken = "MOFFEINPOTMOBILEBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";
+            sd.outroFlavorToken = "MOFFEINPOTMOBILEBODY_OUTRO_FLAVOR";
             (sd as ScriptableObject).name = sd.cachedName;
             PotmobileContent.PotmobileSurvivorDef = sd;
         }
@@ -169,6 +200,20 @@ namespace Potmobile
         private void ContentManager_collectContentPackProviders(RoR2.ContentManagement.ContentManager.AddContentPackProviderDelegate addContentPackProvider)
         {
             addContentPackProvider(new PotmobileContent());
+        }
+        public class StageSpawnInfo
+        {
+            private string stageName;
+            private int minStages;
+
+            public StageSpawnInfo(string stageName, int minStages)
+            {
+                this.stageName = stageName;
+                this.minStages = minStages;
+            }
+
+            public string GetStageName() { return stageName; }
+            public int GetMinStages() { return minStages; }
         }
     }
 }

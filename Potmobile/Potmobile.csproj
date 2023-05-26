@@ -83,6 +83,9 @@
     <Reference Include="R2API.DamageType">
       <HintPath>libs\R2API\R2API.DamageType.dll</HintPath>
     </Reference>
+    <Reference Include="R2API.Director">
+      <HintPath>libs\R2API\R2API.Director.dll</HintPath>
+    </Reference>
     <Reference Include="R2API.Prefab">
       <HintPath>libs\R2API\R2API.Prefab.dll</HintPath>
     </Reference>

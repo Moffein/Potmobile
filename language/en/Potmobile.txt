@@ -1,24 +1,24 @@
 {
 	strings:
 	{
-		"MOFFEINPOTMOBILE_BODY_NAME" : "Potmobile",
-		"MOFFEINPOTMOBILE_BODY_DESCRIPTION" : "Vroom Vroom",
-		"MOFFEINPOTMOBILE_BODY_LORE" : "Vroom Vroom",
-		"MOFFEINPOTMOBILE_BODY_SUBTITLE" : "Vroom Vroom",
-		"MOFFEINPOTMOBILE_BODY_OUTRO_FLAVOR" : "..and so it left, rolling into the distance.",
-		"MOFFEINPOTMOBILE_BODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR" : "..and so it vanished, forever stuck upside down.",
+		"MOFFEINPOTMOBILEBODY_NAME" : "Potmobile",
+		"MOFFEINPOTMOBILEBODY_DESCRIPTION" : "Vroom Vroom",
+		"MOFFEINPOTMOBILEBODY_LORE" : "Vroom Vroom",
+		"MOFFEINPOTMOBILEBODY_SUBTITLE" : "Vroom Vroom",
+		"MOFFEINPOTMOBILEBODY_OUTRO_FLAVOR" : "..and so it left, rolling into the distance.",
+		"MOFFEINPOTMOBILEBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR" : "..and so it vanished, forever stuck upside down.",
 		
-		"MOFFEINPOTMOBILE_BODY_PRIMARY_NAME" : "Pot Cannon",
-		"MOFFEINPOTMOBILE_BODY_PRIMARY_DESCRIPTION" : "Fire a rocket that explodes for <style=cIsDamage>1000% damage</style>.",
+		"MOFFEINPOTMOBILEBODY_PRIMARY_NAME" : "Pot Shot",
+		"MOFFEINPOTMOBILEBODY_PRIMARY_DESCRIPTION" : "Fire an explosive pot for <style=cIsDamage>1000% damage</style>.",
 		
-		"MOFFEINPOTMOBILE_BODY_SECONDARY_NAME" : "Concussion Hop",
-		"MOFFEINPOTMOBILE_BODY_SECONDARY_DESCRIPTION" : "<style=cIsUtility>Hop upwards</style> and <style=cIsUtility>push away</style> nearby enemies.",
+		"MOFFEINPOTMOBILEBODY_SECONDARY_NAME" : "Concussion Hop",
+		"MOFFEINPOTMOBILEBODY_SECONDARY_DESCRIPTION" : "<style=cIsUtility>Hop upwards</style> and <style=cIsUtility>push away</style> nearby enemies.",
 		
-		"MOFFEINPOTMOBILE_BODY_UTILITY_NAME" : "Boost",
-		"MOFFEINPOTMOBILE_BODY_UTILITY_DESCRIPTION" : "Zoom forward and gain <style=cIsUtility>200% movement speed</style>.",
+		"MOFFEINPOTMOBILEBODY_UTILITY_NAME" : "Boost",
+		"MOFFEINPOTMOBILEBODY_UTILITY_DESCRIPTION" : "Zoom forward and gain <style=cIsUtility>200% movement speed</style>.",
 		
-		"MOFFEINPOTMOBILE_BODY_SPECIAL_NAME" : "Reset",
-		"MOFFEINPOTMOBILE_BODY_SPECIAL_DESCRIPTION" : "<style=cIsUtility>Flip over</style>.",
+		"MOFFEINPOTMOBILEBODY_SPECIAL_NAME" : "Reset",
+		"MOFFEINPOTMOBILEBODY_SPECIAL_DESCRIPTION" : "<style=cIsUtility>Flip over</style>.",
 		
 	}
 }
