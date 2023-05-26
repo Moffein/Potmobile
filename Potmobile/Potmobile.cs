@@ -32,7 +32,8 @@ namespace Potmobile
 
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileBody", true);
 
-            SpeedController sc = bodyObject.AddComponent<SpeedController>();
+            bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
+            bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
 
             //Fix Out of Bounds teleport
             bodyObject.layer = 0;
