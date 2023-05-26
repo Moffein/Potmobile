@@ -35,6 +35,13 @@ namespace Potmobile
             bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
 
+            //Fix interactor
+            Interactor interactor = bodyObject.AddComponent<Interactor>();
+            interactor.maxInteractionDistance = 6f;
+
+            InteractionDriver id = bodyObject.AddComponent<InteractionDriver>();
+            id.highlightInteractor = true;
+
             //Fix Out of Bounds teleport
             bodyObject.layer = 0;
 
