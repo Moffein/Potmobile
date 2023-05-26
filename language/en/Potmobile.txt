@@ -11,8 +11,8 @@
 		"MOFFEINPOTMOBILEBODY_PRIMARY_NAME" : "Pot Shot",
 		"MOFFEINPOTMOBILEBODY_PRIMARY_DESCRIPTION" : "Fire an explosive pot for <style=cIsDamage>1000% damage</style>.",
 		
-		"MOFFEINPOTMOBILEBODY_SECONDARY_NAME" : "Concussion Hop",
-		"MOFFEINPOTMOBILEBODY_SECONDARY_DESCRIPTION" : "<style=cIsUtility>Hop upwards</style> and <style=cIsUtility>push away</style> nearby enemies.",
+		"MOFFEINPOTMOBILEBODY_SECONDARY_NAME" : "Concussion Bounce",
+		"MOFFEINPOTMOBILEBODY_SECONDARY_DESCRIPTION" : "<style=cIsUtility>Bounce upwards</style> and <style=cIsUtility>push away</style> nearby enemies.",
 		
 		"MOFFEINPOTMOBILEBODY_UTILITY_NAME" : "Nitro Rush",
 		"MOFFEINPOTMOBILEBODY_UTILITY_DESCRIPTION" : "Zoom forward and gain <style=cIsUtility>200% movement speed</style>.",
