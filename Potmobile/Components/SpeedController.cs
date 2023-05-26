@@ -5,9 +5,9 @@ namespace Potmobile.Components
 {
     public class SpeedController : MonoBehaviour
     {
-        private Rigidbody rigidbody;
-        private CharacterBody body;
-        private HoverVehicleMotor motor;
+        public Rigidbody rigidbody;
+        public CharacterBody body;
+        public HoverVehicleMotor motor;
         private float baseSpeed;
 
         public float speedMult = 1f;

@@ -49,7 +49,7 @@ namespace Potmobile
             fixJumpPad = base.Config.Bind<bool>(new ConfigDefinition("General", "Fix Jump Pads"), true, new ConfigDescription("Fixes Potmobiles ignoring jump pads.")).Value;
 
             sortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position"), 9999f, new ConfigDescription("Position in the Survivor Select menu.")).Value;
-            GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), true, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
+            GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), false, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
 
             EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles to the enemy spawn pool.")).Value;
             EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles to the Dissonance spawn pool if the enemy is enabled.")).Value;
@@ -217,7 +217,18 @@ namespace Potmobile
         {
             orig(self, other);
 
-
+            if (other.gameObject)
+            {
+                SpeedController sc = other.gameObject.GetComponent<SpeedController>();
+                if (sc)
+                {
+                    if (sc.rigidbody && RoR2.Util.HasEffectiveAuthority(other.gameObject))
+                    {
+                        Util.PlaySound(self.jumpSoundString, self.gameObject);
+                        sc.rigidbody.velocity = 1.15f * self.jumpVelocity;   //undershoots moon jump pad without multiplier
+                    }
+                }
+            }
         }
 
         private void ContentManager_collectContentPackProviders(RoR2.ContentManagement.ContentManager.AddContentPackProviderDelegate addContentPackProvider)
