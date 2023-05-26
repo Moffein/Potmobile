@@ -14,17 +14,36 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.bepis.r2api.prefab")]
     [BepInDependency("com.bepis.r2api.damagetype")]
+    [BepInDependency("com.bepis.r2api.recalculatestats")]
     [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.0.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class Potmobile : BaseUnityPlugin
     {
+        public static PluginInfo pluginInfo;
+        private static float sortPosition = 9999f;
         public void Awake()
         {
+            pluginInfo = Info;
+            ReadConfig();
+            Tokens.Init();
             DamageTypeSetup.Init();
             BuildBodyObject();
+            CreateSurvivorDef();
             SkillSetup.Init();
             MasterSetup.Init();
+            EnemySetup.Init();
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
+            RoR2.RoR2Application.onLoad += LateSetup;
+        }
+
+        private void ReadConfig()
+        {
+
+        }
+
+        private void LateSetup()
+        {
+            PotmobileContent.PotmobileBodyIndex = BodyCatalog.FindBodyIndex("MoffeinPotmobileBody");
         }
 
         private void BuildBodyObject()
@@ -48,6 +67,7 @@ namespace Potmobile
             bodyObject.layer = 0;
 
             CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
+            cb.bodyColor = new Color32(200, 200, 200, 255);
             cb.name = "MoffeinPotmobileBody";
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
@@ -55,8 +75,8 @@ namespace Potmobile
 
             cb.baseNameToken = "MOFFEINPOTMOBILE_BODY_NAME";
             cb.subtitleNameToken = "MOFFEINPOTMOBILE_BODY_SUBTITLE";
-            cb.baseMaxHealth = 420f;
-            cb.levelMaxHealth = 126f;
+            cb.baseMaxHealth = 480f;
+            cb.levelMaxHealth = 144f;
             cb.baseArmor =  0;
             cb.levelArmor = 0f;
             cb.baseRegen = 1f;
@@ -126,6 +146,24 @@ namespace Potmobile
             }
 
             PotmobileContent.PotmobileBodyObject = bodyObject;
+        }
+
+        private void CreateSurvivorDef()
+        {
+            GameObject displayObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileDisplay", false);
+            displayObject = displayObject.GetComponent<ModelLocator>().modelTransform.gameObject;
+            displayObject.transform.localScale *= 0.5f;
+
+            SurvivorDef sd = ScriptableObject.CreateInstance<SurvivorDef>();
+            sd.cachedName = "MoffeinPotmobile";
+            sd.bodyPrefab = PotmobileContent.PotmobileBodyObject;
+            sd.hidden = false;
+            sd.desiredSortPosition = sortPosition;
+            sd.descriptionToken = "MOFFEINPOTMOBILE_BODY_DESCRIPTION";
+            sd.displayPrefab = displayObject;
+            sd.mainEndingEscapeFailureFlavorToken = "MOFFEINPOTMOBILE_BODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";
+            (sd as ScriptableObject).name = sd.cachedName;
+            PotmobileContent.PotmobileSurvivorDef = sd;
         }
 
         private void ContentManager_collectContentPackProviders(RoR2.ContentManagement.ContentManager.AddContentPackProviderDelegate addContentPackProvider)

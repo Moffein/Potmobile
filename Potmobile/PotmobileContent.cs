@@ -11,8 +11,10 @@ namespace Potmobile
     public class PotmobileContent : IContentPackProvider
     {
         public static ContentPack content = new ContentPack();
+        public static SurvivorDef PotmobileSurvivorDef;
         public static GameObject PotmobileBodyObject;
         public static GameObject PotmobileMasterObject;
+        public static BodyIndex PotmobileBodyIndex = BodyIndex.None;
 
         public static List<SkillFamily> skillFamilies = new List<SkillFamily>();
         public static List<SkillDef> skillDefs = new List<SkillDef>();
@@ -50,6 +52,7 @@ namespace Potmobile
         {
             if (PotmobileBodyObject) content.bodyPrefabs.Add(new GameObject[] { PotmobileBodyObject });
             if (PotmobileMasterObject) content.masterPrefabs.Add(new GameObject[] { PotmobileMasterObject });
+            if (PotmobileSurvivorDef) content.survivorDefs.Add(new SurvivorDef[] { PotmobileSurvivorDef });
 
             content.skillDefs.Add(skillDefs.ToArray());
             content.entityStateTypes.Add(entityStates.ToArray());

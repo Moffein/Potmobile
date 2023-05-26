@@ -23,7 +23,7 @@ namespace Potmobile
             {
                 if (damageInfo.HasModdedDamageType(PotmobileContent.ModdedDamageTypes.BonusForceToPotmobile))
                 {
-                    if (self.body && self.body.bodyIndex == BodyCatalog.FindBodyIndex("MoffeinPotmobileBody"))
+                    if (self.body && self.body.bodyIndex == PotmobileContent.PotmobileBodyIndex)
                     {
                         damageInfo.force *= 4f;
                     }
