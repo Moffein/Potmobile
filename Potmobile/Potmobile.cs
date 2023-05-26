@@ -17,6 +17,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api.prefab")]
     [BepInDependency("com.bepis.r2api.director")]
     [BepInDependency("com.bepis.r2api.damagetype")]
+    [BepInDependency("com.bepis.r2api.loadout")]
     [BepInDependency("com.bepis.r2api.recalculatestats")]
     [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.0.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
@@ -35,6 +36,7 @@ namespace Potmobile
             Tokens.Init();
             DamageTypeSetup.Init();
             BuildBodyObject();
+            Skins.InitSkins(PotmobileContent.PotmobileBodyObject);
             CreateSurvivorDef();
             SkillSetup.Init();
             MasterSetup.Init();
