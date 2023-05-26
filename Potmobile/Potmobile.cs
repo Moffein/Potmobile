@@ -4,24 +4,25 @@ using Potmobile.Components;
 using R2API;
 using R2API.Utils;
 using RoR2;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 
 namespace Potmobile
 {
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.bepis.r2api.prefab")]
-    [BepInDependency("com.bepis.r2api.recalculatestats")]
+    [BepInDependency("com.bepis.r2api.damagetype")]
     [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.0.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class Potmobile : BaseUnityPlugin
     {
         public void Awake()
         {
+            DamageTypeSetup.Init();
             BuildBodyObject();
+            BuildMaster();
             SkillSetup.Init();
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
         }
@@ -34,6 +35,7 @@ namespace Potmobile
 
             bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
+            bodyObject.AddComponent<GiveOOBItem>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
 
             //Fix interactor
             Interactor interactor = bodyObject.AddComponent<Interactor>();
@@ -46,13 +48,16 @@ namespace Potmobile
             bodyObject.layer = 0;
 
             CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
+            cb.name = "MoffeinPotmobileBody";
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
             cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
 
-            cb.baseMaxHealth = 480;
-            cb.levelMaxHealth = 144f;
-            cb.baseArmor = 25f;
+            cb.baseNameToken = "MOFFEINPOTMOBILE_BODY_NAME";
+            cb.subtitleNameToken = "MOFFEINPOTMOBILE_BODY_SUBTITLE";
+            cb.baseMaxHealth = 420f;
+            cb.levelMaxHealth = 126f;
+            cb.baseArmor =  0;
             cb.levelArmor = 0f;
             cb.baseRegen = 1f;
             cb.levelRegen = 0.2f;
@@ -110,7 +115,26 @@ namespace Potmobile
             nsm.stateMachines.Append(boostMachine).ToArray();
             #endregion
 
+            //Fix freeze nullref spam
+            if (!bodyObject.GetComponent<SetStateOnHurt>())
+            {
+                SetStateOnHurt ssoh = bodyObject.AddComponent<SetStateOnHurt>();
+                ssoh.canBeFrozen = false;   //setting this to true doesnt seem to enable freezing, so I'll just leave it off
+                ssoh.canBeHitStunned = false;
+                ssoh.canBeStunned = false;
+                ssoh.idleStateMachine = new EntityStateMachine[] { EntityStateMachine.FindByCustomName(bodyObject, "Body"), EntityStateMachine.FindByCustomName(bodyObject, "Weapon"), boostMachine };
+            }
+
             PotmobileContent.PotmobileBodyObject = bodyObject;
+        }
+
+        private void BuildMaster()
+        {
+            GameObject masterObject = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoMonsterMaster.prefab").WaitForCompletion().InstantiateClone("MoffeinPotmobileMaster", true);
+            CharacterMaster cm = masterObject.GetComponent<CharacterMaster>();
+            cm.bodyPrefab = PotmobileContent.PotmobileBodyObject;
+
+            PotmobileContent.PotmobileMasterObject = masterObject;
         }
 
         private void ContentManager_collectContentPackProviders(RoR2.ContentManagement.ContentManager.AddContentPackProviderDelegate addContentPackProvider)

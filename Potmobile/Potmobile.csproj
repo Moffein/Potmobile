@@ -80,11 +80,11 @@
     <Reference Include="R2API.Core">
       <HintPath>libs\R2API\R2API.Core.dll</HintPath>
     </Reference>
+    <Reference Include="R2API.DamageType">
+      <HintPath>libs\R2API\R2API.DamageType.dll</HintPath>
+    </Reference>
     <Reference Include="R2API.Prefab">
       <HintPath>libs\R2API\R2API.Prefab.dll</HintPath>
-    </Reference>
-    <Reference Include="R2API.RecalculateStats">
-      <HintPath>libs\R2API\R2API.RecalculateStats.dll</HintPath>
     </Reference>
     <Reference Include="Rewired_CSharp">
       <HintPath>libs\Rewired_CSharp.dll</HintPath>

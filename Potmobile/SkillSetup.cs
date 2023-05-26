@@ -20,11 +20,9 @@ namespace Potmobile
 
             SkillLocator skillLocator = PotmobileContent.PotmobileBodyObject.GetComponent<SkillLocator>();
             BuildPrimary(skillLocator);
+            BuildSecondary(skillLocator);
             BuildUtility(skillLocator);
             BuildSpecial(skillLocator);
-
-            SkillDef filler = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Heretic/HereticDefaultAbility.asset").WaitForCompletion();
-            AddSkillToFamily(skillLocator.secondary.skillFamily, filler);
         }
 
 
@@ -35,8 +33,8 @@ namespace Potmobile
             SkillDef primaryDef = SkillDef.CreateInstance<SkillDef>();
             primaryDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Weapon.FireCannon));
             primaryDef.baseRechargeInterval = 0f;
-            primaryDef.skillNameToken = "MOFFEINPOTMOBILE_PRIMARY_NAME";
-            primaryDef.skillDescriptionToken = "MOFFEINPOTMOBILE_PRIMARY_DESC";
+            primaryDef.skillNameToken = "MOFFEINPOTMOBILE_BODY_PRIMARY_NAME";
+            primaryDef.skillDescriptionToken = "MOFFEINPOTMOBILE_BODY_PRIMARY_DESC";
             primaryDef.skillName = "FireCannon";
             primaryDef.icon = Addressables.LoadAssetAsync<ToolbotWeaponSkillDef>("RoR2/Base/Toolbot/ToolbotBodyFireGrenadeLauncher.asset").WaitForCompletion().icon;
             primaryDef.baseMaxStock = 1;
@@ -66,14 +64,42 @@ namespace Potmobile
             PotmobileContent.projectilePrefabs.Add(projectilePrefab);
             EntityStates.MoffeinPotmobile.Weapon.FireCannon.projectilePrefab = projectilePrefab;
         }
+        private static void BuildSecondary(SkillLocator skillLocator)
+        {
+            SkillDef secondaryDef = SkillDef.CreateInstance<SkillDef>();
+            secondaryDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Weapon.PushAll));
+            secondaryDef.baseRechargeInterval = 5f;
+            secondaryDef.skillNameToken = "MOFFEINPOTMOBILE_BODY_SECONDARY_NAME";
+            secondaryDef.skillDescriptionToken = "MOFFEINPOTMOBILE_BODY_SECONDARY_DESC";
+            secondaryDef.skillName = "PushAll";
+            secondaryDef.icon = Addressables.LoadAssetAsync<SkillDef>("RoR2/DLC1/Railgunner/RailgunnerBodyFireMineConcussive.asset").WaitForCompletion().icon;
+            secondaryDef.baseMaxStock = 1;
+            secondaryDef.rechargeStock = 1;
+            secondaryDef.beginSkillCooldownOnSkillEnd = false;
+            secondaryDef.activationStateMachineName = "Weapon";
+            secondaryDef.interruptPriority = InterruptPriority.Skill;
+            secondaryDef.isCombatSkill = false;
+            secondaryDef.cancelSprintingOnActivation = false;
+            secondaryDef.canceledFromSprinting = false;
+            secondaryDef.mustKeyPress = false;
+            secondaryDef.requiredStock = 1;
+            secondaryDef.stockToConsume = 1;
+            secondaryDef.keywordTokens = new string[] { };
+            (secondaryDef as ScriptableObject).name = secondaryDef.skillName;
+
+            PotmobileContent.skillDefs.Add(secondaryDef);
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.PushAll));
+            AddSkillToFamily(skillLocator.secondary.skillFamily, secondaryDef);
+            PotmobileContent.SkillDefs.Push = secondaryDef;
+        }
 
         private static void BuildUtility(SkillLocator skillLocator)
         {
             SkillDef utilityDef = SkillDef.CreateInstance<SkillDef>();
             utilityDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Boost.Boost));
-            utilityDef.baseRechargeInterval = 8f;
-            utilityDef.skillNameToken = "MOFFEINPOTMOBILE_UTILITY_NAME";
-            utilityDef.skillDescriptionToken = "MOFFEINPOTMOBILE_UTILITY_DESC";
+            utilityDef.baseRechargeInterval = 10f;
+            utilityDef.skillNameToken = "MOFFEINPOTMOBILE_BODY_UTILITY_NAME";
+            utilityDef.skillDescriptionToken = "MOFFEINPOTMOBILE_BODY_UTILITY_DESC";
             utilityDef.skillName = "Boost";
             utilityDef.icon = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Toolbot/ToolbotBodyToolbotDash.asset").WaitForCompletion().icon;
             utilityDef.baseMaxStock = 1;
@@ -101,8 +127,8 @@ namespace Potmobile
             SkillDef specialDef = SkillDef.CreateInstance<SkillDef>();
             specialDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Boost.Reset));
             specialDef.baseRechargeInterval = 5f;
-            specialDef.skillNameToken = "MOFFEINPOTMOBILE_SPECIAL_NAME";
-            specialDef.skillDescriptionToken = "MOFFEINPOTMOBILE_SPECIAL_DESC";
+            specialDef.skillNameToken = "MOFFEINPOTMOBILE_BODY_SPECIAL_NAME";
+            specialDef.skillDescriptionToken = "MOFFEINPOTMOBILE_BODY_SPECIAL_DESC";
             specialDef.skillName = "Boost";
             specialDef.icon = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Toolbot/ToolbotBodySwap.asset").WaitForCompletion().icon;
             specialDef.baseMaxStock = 1;

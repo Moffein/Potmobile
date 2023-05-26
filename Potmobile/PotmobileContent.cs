@@ -19,6 +19,11 @@ namespace Potmobile
         public static List<Type> entityStates = new List<Type>();
         public static List<GameObject> projectilePrefabs = new List<GameObject>();
 
+        public static class ModdedDamageTypes
+        {
+            public static R2API.DamageAPI.ModdedDamageType BonusForceToPotmobile;
+        }
+
         public static class SkillDefs
         {
             public static SkillDef FireCannon;
