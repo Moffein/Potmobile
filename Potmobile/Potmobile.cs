@@ -223,7 +223,7 @@ namespace Potmobile
                 SpeedController sc = other.gameObject.GetComponent<SpeedController>();
                 if (sc)
                 {
-                    if (sc.rigidbody && RoR2.Util.HasEffectiveAuthority(other.gameObject))
+                    if (sc.rigidbody && sc.HasEffectiveAuthority())
                     {
                         //Util.PlaySound(self.jumpSoundString, self.gameObject);    //Sound gets spammed since there's no DisableAirControl flag to tell when a jump pad has been used.
                         sc.rigidbody.velocity = 1.15f * self.jumpVelocity;   //undershoots moon jump pad without multiplier

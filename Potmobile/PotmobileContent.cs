@@ -26,7 +26,7 @@ namespace Potmobile
 
         public static class ModdedDamageTypes
         {
-            public static R2API.DamageAPI.ModdedDamageType BonusForceToPotmobile;
+            public static DamageAPI.ModdedDamageType BonusForceToPotmobile;
         }
 
         public static class SkillDefs

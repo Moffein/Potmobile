@@ -1,10 +1,12 @@
 ﻿using RoR2;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Potmobile.Components
 {
     public class SpeedController : MonoBehaviour
     {
+        private NetworkIdentity networkIdentity;
         public Rigidbody rigidbody;
         public CharacterBody body;
         public HoverVehicleMotor motor;
@@ -14,6 +16,7 @@ namespace Potmobile.Components
 
         public void Awake()
         {
+            networkIdentity = base.GetComponent<NetworkIdentity>();
             motor = base.GetComponent<HoverVehicleMotor>();
             body = base.GetComponent<CharacterBody>();
             rigidbody = base.GetComponent<Rigidbody>();
@@ -51,6 +54,12 @@ namespace Potmobile.Components
 
                 motor.motorForce = calcSpeed;
             }
+        }
+
+        //Copied from RoR2.Util to skip the getcomponent check
+        public bool HasEffectiveAuthority()
+        {
+            return networkIdentity && (networkIdentity.hasAuthority || (NetworkServer.active && networkIdentity.clientAuthorityOwner == null));
         }
     }
 }

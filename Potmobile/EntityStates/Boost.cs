@@ -16,7 +16,7 @@ namespace EntityStates.MoffeinPotmobile.Boost
             speedController = base.GetComponent<SpeedController>();
             if (speedController)
             {
-                speedController.speedMult *= forceMultiplier;
+                speedController.speedMult *= forceMultiplier;   //Kind of an unsafe way to do this
             }
         }
 
@@ -55,7 +55,6 @@ namespace EntityStates.MoffeinPotmobile.Boost
         }
 
         private SpeedController speedController;
-        private float origMotorForce;
         public static float baseDuration = 2.5f;
         public static float forceMultiplier = 2f;
 

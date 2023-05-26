@@ -2,6 +2,7 @@
 using RoR2;
 using R2API;
 using UnityEngine.Networking;
+using Potmobile.Components;
 
 namespace Potmobile
 {
@@ -14,16 +15,16 @@ namespace Potmobile
             initialized = true;
             PotmobileContent.ModdedDamageTypes.BonusForceToPotmobile = DamageAPI.ReserveDamageType();
 
-            On.RoR2.HealthComponent.TakeDamage += ApplyBonusForceToPotmobile;
+            On.RoR2.HealthComponent.TakeDamage += HealthComponent_TakeDamage;
         }
 
-        private static void ApplyBonusForceToPotmobile(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
+        private static void HealthComponent_TakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
         {
             if (NetworkServer.active)
             {
                 if (damageInfo.HasModdedDamageType(PotmobileContent.ModdedDamageTypes.BonusForceToPotmobile))
                 {
-                    if (self.body && self.body.bodyIndex == PotmobileContent.PotmobileBodyIndex)
+                    if (self.body.bodyIndex == PotmobileContent.PotmobileBodyIndex)
                     {
                         damageInfo.force *= 4f;
                     }
