@@ -22,8 +22,8 @@ namespace Potmobile
         {
             DamageTypeSetup.Init();
             BuildBodyObject();
-            BuildMaster();
             SkillSetup.Init();
+            MasterSetup.Init();
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
         }
 
@@ -126,15 +126,6 @@ namespace Potmobile
             }
 
             PotmobileContent.PotmobileBodyObject = bodyObject;
-        }
-
-        private void BuildMaster()
-        {
-            GameObject masterObject = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoMonsterMaster.prefab").WaitForCompletion().InstantiateClone("MoffeinPotmobileMaster", true);
-            CharacterMaster cm = masterObject.GetComponent<CharacterMaster>();
-            cm.bodyPrefab = PotmobileContent.PotmobileBodyObject;
-
-            PotmobileContent.PotmobileMasterObject = masterObject;
         }
 
         private void ContentManager_collectContentPackProviders(RoR2.ContentManagement.ContentManager.AddContentPackProviderDelegate addContentPackProvider)
