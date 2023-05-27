@@ -16,6 +16,8 @@ namespace Potmobile
         public static bool enableEnemy = false;
         public static bool enableDissonance = true;
 
+        public static int directorCost = 80;
+
         public static void Init()
         {
             if (initialized) return;
@@ -51,7 +53,7 @@ namespace Potmobile
             potCSC.nodeGraphType = MapNodeGroup.GraphType.Ground;
             potCSC.requiredFlags = NodeFlags.None;
             potCSC.forbiddenFlags = NodeFlags.NoCharacterSpawn;
-            potCSC.directorCreditCost = 80;
+            potCSC.directorCreditCost = directorCost;
             potCSC.occupyPosition = false;
             potCSC.loadout = new SerializableLoadout();
             potCSC.noElites = false;

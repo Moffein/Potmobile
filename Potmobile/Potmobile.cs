@@ -77,6 +77,7 @@ namespace Potmobile
             specialCooldown = base.Config.Bind<float>(new ConfigDefinition("Stats", "Special Cooldown"), 5f, new ConfigDescription("How long this skill takes to recharge.")).Value;
 
             EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles to the enemy spawn pool.")).Value;
+            EnemySetup.directorCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost"), 80, new ConfigDescription("Cost of spawning an enemy Potmobile.")).Value;
             EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles to the Dissonance spawn pool if the enemy is enabled.")).Value;
             EnemySetup.nerfEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Enemy"), true, new ConfigDescription("Nerfs NPC Potmobiles so they don't instakill you.")).Value;
             stages = base.Config.Bind<string>(new ConfigDefinition("Enemy", "Stage List"), "golemplains - loop, itgolemplains, goolake, itgoolake, frozenwall, itfrozenwall, snowyforest - loop, goldshores, drybasin, forgottenhaven", new ConfigDescription("What stages the monster will show up on. Add a '- loop' after the stagename to make it only spawn after looping. List of stage names can be found at https://github.com/risk-of-thunder/R2Wiki/wiki/List-of-scene-names")).Value;
