@@ -59,6 +59,7 @@ namespace Potmobile
 
             EntityStates.MoffeinPotmobile.Weapon.FireCannon.enableICBMSynergy = base.Config.Bind<bool>(new ConfigDefinition("Stats", "Primary - ICBM Synergy"), true, new ConfigDescription("Primary is affected by ICBM.")).Value;
             EntityStates.MoffeinPotmobile.Weapon.FireCannon.damageCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Damage Coefficient"), 10f, new ConfigDescription("How much damage this attack deals. (changes do not show up in skill description)")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.FireCannon.force = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Force"), 2500f, new ConfigDescription("Knockback power against enemies.")).Value;
             EntityStates.MoffeinPotmobile.Weapon.FireCannon.baseDuration = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Duration"), 1.5f, new ConfigDescription("How long it takes to fire each shot.")).Value;
             primaryRadius = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Blast Radius"), 8f, new ConfigDescription("Blast radius of the primary attack.")).Value;
 
