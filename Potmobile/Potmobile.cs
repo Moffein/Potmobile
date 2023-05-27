@@ -18,7 +18,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api.damagetype")]
     [BepInDependency("com.bepis.r2api.loadout")]
     [BepInDependency("com.bepis.r2api.recalculatestats")]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.0.0")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.1.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class Potmobile : BaseUnityPlugin
     {
@@ -284,8 +284,12 @@ namespace Potmobile
             //Fix Out of Bounds teleport
             bodyObject.layer = 0;
 
+            //Add charactermodel. Does this do anything?
+            CharacterModel characterModel = bodyObject.AddComponent<CharacterModel>();
+            characterModel.baseRendererInfos = bodyObject.GetComponentInChildren<CharacterModel>().baseRendererInfos;
+
             CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
-            cb.bodyColor = new Color32(220, 220, 200, 255); //todo: change
+            cb.bodyColor = new Color32(34, 71, 224, 255);
             cb.name = "MoffeinHaulerBody";
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
@@ -294,8 +298,8 @@ namespace Potmobile
 
             cb.baseNameToken = "MOFFEINHAULERBODY_NAME";
             cb.subtitleNameToken = "MOFFEINHAULERBODY_SUBTITLE";
-            cb.baseMaxHealth = 480f;
-            cb.levelMaxHealth = 144f;
+            cb.baseMaxHealth = 600f;
+            cb.levelMaxHealth = 180f;
             cb.baseArmor = 0;
             cb.levelArmor = 0f;
             cb.baseRegen = 1f;
