@@ -6,10 +6,14 @@ namespace Potmobile.Components
 {
     public class SpeedController : MonoBehaviour
     {
+        public static bool allowReverse = true;
+
+        public float reverseSpeedCoefficient = 0.5f;
         private NetworkIdentity networkIdentity;
         public Rigidbody rigidbody;
         public CharacterBody body;
         public HoverVehicleMotor motor;
+        private InputBankTest inputBank;
         private float baseSpeed;
 
         public float speedMult = 1f;
@@ -20,6 +24,7 @@ namespace Potmobile.Components
             motor = base.GetComponent<HoverVehicleMotor>();
             body = base.GetComponent<CharacterBody>();
             rigidbody = base.GetComponent<Rigidbody>();
+            inputBank = base.GetComponent<InputBankTest>();
 
             if (motor)
             {
@@ -43,6 +48,20 @@ namespace Potmobile.Components
         {
             if (motor)
             {
+                bool reverse = false;
+                if (allowReverse && inputBank)
+                {
+                    Ray aimRay = inputBank.GetAimRay();
+                    Vector2 moveDirectionFlat = new Vector2(inputBank.moveVector.x, inputBank.moveVector.z);
+                    Vector2 forwardDirectionFlat = new Vector2(aimRay.direction.x, aimRay.direction.z);
+
+                    float angle = Vector2.Angle(moveDirectionFlat, forwardDirectionFlat);
+                    if (angle > 120f)
+                    {
+                        reverse = true;
+                    }
+                }
+
                 float calcSpeed = baseSpeed;
 
                 float bodySpeedMult = 1f;
@@ -52,6 +71,11 @@ namespace Potmobile.Components
                 }
                 calcSpeed *= bodySpeedMult * speedMult;
 
+                if (reverse)
+                {
+                    calcSpeed = Mathf.Abs(calcSpeed);
+                    calcSpeed *= reverseSpeedCoefficient * -1f;
+                }
                 motor.motorForce = calcSpeed;
             }
         }
