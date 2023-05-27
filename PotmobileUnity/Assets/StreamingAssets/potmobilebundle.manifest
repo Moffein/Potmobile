@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1338730823
+CRC: 1692830767
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: eef435c48dd2f6596a26958bd866cf19
+    Hash: 485012b5d73d81a3e1af0ac9702ad29f
   TypeTreeHash:
     serializedVersion: 2
     Hash: c90fc19e2679e5295d10bd00f33cb4c3
@@ -15,5 +15,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Resources/texModIcon.png
+- Assets/Resources/texIconPotmobile.png
+- Assets/Resources/texIconHauler.png
 Dependencies: []

@@ -23,7 +23,8 @@ namespace Potmobile
     public class Potmobile : BaseUnityPlugin
     {
         public static PluginInfo pluginInfo;
-        public static float sortPosition = 9999f;
+        public static float potSortPosition = 9999f;
+        public static float haulSortPosition = 10000f;
         public static string stagesPotmobile = string.Empty;
         public static string stagesHauler = string.Empty;
         public static List<StageSpawnInfo> StageListPotmobile = new List<StageSpawnInfo>();
@@ -66,7 +67,8 @@ namespace Potmobile
         {
             fixJumpPad = base.Config.Bind<bool>(new ConfigDefinition("General", "Fix Jump Pads"), true, new ConfigDescription("Fixes Potmobiles ignoring jump pads.")).Value;
 
-            sortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position"), 9999f, new ConfigDescription("Position in the Survivor Select menu.")).Value;
+            potSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Potmobile)"), 9999f, new ConfigDescription("Position of Potmobile in the Survivor Select menu.")).Value;
+            haulSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Hauler)"), 10000f, new ConfigDescription("Position of Hauler in the Survivor Select menu.")).Value;
             GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), false, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
 
             EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.enableICBMSynergy = base.Config.Bind<bool>(new ConfigDefinition("Stats", "Primary - ICBM Synergy"), true, new ConfigDescription("Primary is affected by ICBM.")).Value;
@@ -92,7 +94,7 @@ namespace Potmobile
             EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles and Haulers to the enemy spawn pool.")).Value;
             EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles and Haulers to the Dissonance spawn pool if the enemy is enabled.")).Value;
             EnemySetup.potmobileCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Potmobile)"), 80, new ConfigDescription("Cost of spawning a Potmobile.")).Value;
-            EnemySetup.haulerCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Hauler)"), 80, new ConfigDescription("Cost of spawning a Hauler.")).Value;
+            EnemySetup.haulerCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Hauler)"), 100, new ConfigDescription("Cost of spawning a Hauler.")).Value;
             EnemySetup.nerfPotmobile = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Potmobile"), true, new ConfigDescription("Nerfs NPC Potmobiles and Haulers so they don't instakill you.")).Value;
             EnemySetup.nerfHauler = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Hauler"), true, new ConfigDescription("Nerfs NPC Haulers so they don't instakill you.")).Value;
             stagesPotmobile = base.Config.Bind<string>(new ConfigDefinition("Enemy", "Stage List (Potmobile)"), "golemplains - loop, itgolemplains, goolake, itgoolake, frozenwall, itfrozenwall, snowyforest - loop, drybasin, forgottenhaven, goldshores", new ConfigDescription("What stages Potmobiles will show up on. Add a '- loop' after the stagename to make it only spawn after looping. List of stage names can be found at https://github.com/risk-of-thunder/R2Wiki/wiki/List-of-scene-names")).Value;
@@ -165,7 +167,7 @@ namespace Potmobile
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
             cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
-            cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texModIcon.png");
+            cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texIconPotmobile.png");
 
             cb.baseNameToken = "MOFFEINPOTMOBILEBODY_NAME";
             cb.subtitleNameToken = "MOFFEINPOTMOBILEBODY_SUBTITLE";
@@ -193,7 +195,7 @@ namespace Potmobile
             GameObject hbObject = modelLocator.modelTransform.gameObject;
             BoxCollider bc = hbObject.AddComponent<BoxCollider>();
             bc.center = new Vector3(0f, 0f, 0f);
-            bc.size = new Vector3(3.8f, 1.1f, 3.8f);
+            bc.size = new Vector3(3.5f, 1f, 4f);
             HurtBoxGroup goHurtBoxGroup = hbObject.AddComponent<HurtBoxGroup>();
 
             HurtBox goHurtBox = hbObject.AddComponent<HurtBox>();
@@ -256,7 +258,7 @@ namespace Potmobile
             sd.cachedName = "MoffeinPotmobile";
             sd.bodyPrefab = PotmobileContent.PotmobileBodyObject;
             sd.hidden = false;
-            sd.desiredSortPosition = sortPosition;
+            sd.desiredSortPosition = potSortPosition;
             sd.descriptionToken = "MOFFEINPOTMOBILEBODY_DESCRIPTION";
             sd.displayPrefab = displayObject;
             sd.mainEndingEscapeFailureFlavorToken = "MOFFEINPOTMOBILEBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";
@@ -276,7 +278,7 @@ namespace Potmobile
 
             //Fix interactor
             Interactor interactor = bodyObject.AddComponent<Interactor>();
-            interactor.maxInteractionDistance = 6f;
+            interactor.maxInteractionDistance = 10f;
 
             InteractionDriver id = bodyObject.AddComponent<InteractionDriver>();
             id.highlightInteractor = true;
@@ -294,18 +296,18 @@ namespace Potmobile
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
             cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
-            //cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texModIcon.png");
+            cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texIconHauler.png");
 
             cb.baseNameToken = "MOFFEINHAULERBODY_NAME";
             cb.subtitleNameToken = "MOFFEINHAULERBODY_SUBTITLE";
             cb.baseMaxHealth = 600f;
-            cb.levelMaxHealth = 180f;
-            cb.baseArmor = 0;
+            cb.levelMaxHealth = 185f;
+            cb.baseArmor = 20;
             cb.levelArmor = 0f;
             cb.baseRegen = 1f;
             cb.levelRegen = 0.2f;
-            cb.baseDamage = 12f;
-            cb.levelDamage = 2.4f;
+            cb.baseDamage = 14f;
+            cb.levelDamage = 2.8f;
 
             #region hurtbox
             HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();
@@ -321,8 +323,8 @@ namespace Potmobile
 
             GameObject hbObject = modelLocator.modelTransform.gameObject;
             BoxCollider bc = hbObject.AddComponent<BoxCollider>();
-            bc.center = new Vector3(0f, 0f, 0f);
-            bc.size = new Vector3(3.5f, 2f, 3.5f);
+            bc.center = new Vector3(0f, 1f, 0f);
+            bc.size = new Vector3(5.5f, 3f, 10f);
             HurtBoxGroup goHurtBoxGroup = hbObject.AddComponent<HurtBoxGroup>();
 
             HurtBox goHurtBox = hbObject.AddComponent<HurtBox>();
@@ -391,7 +393,7 @@ namespace Potmobile
             sd.cachedName = "MoffeinHauler";
             sd.bodyPrefab = PotmobileContent.HaulerBodyObject;
             sd.hidden = false;
-            sd.desiredSortPosition = sortPosition;
+            sd.desiredSortPosition = haulSortPosition;
             sd.descriptionToken = "MOFFEINHAULERBODY_DESCRIPTION";
             sd.displayPrefab = displayObject;
             sd.mainEndingEscapeFailureFlavorToken = "MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";

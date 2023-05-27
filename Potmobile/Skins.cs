@@ -35,7 +35,7 @@ namespace Potmobile
 
             #region DefaultSkin
             SkinDef defaultSkin = CreateSkinDef("DEFAULT_SKIN",
-                Assets.assetBundle.LoadAsset<Sprite>("texModIcon.png"),
+                (bodyPrefab == PotmobileContent.HaulerBodyObject ? Assets.assetBundle.LoadAsset<Sprite>("texIconHauler.png") : Assets.assetBundle.LoadAsset<Sprite>("texIconPotmobile.png")),
                 defaultRenderers,
                 mainRenderer,
                 model);
