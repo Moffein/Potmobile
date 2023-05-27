@@ -95,7 +95,7 @@ namespace Potmobile
             EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles and Haulers to the enemy spawn pool.")).Value;
             EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles and Haulers to the Dissonance spawn pool if the enemy is enabled.")).Value;
             EnemySetup.potmobileCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Potmobile)"), 80, new ConfigDescription("Cost of spawning a Potmobile.")).Value;
-            EnemySetup.haulerCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Hauler)"), 100, new ConfigDescription("Cost of spawning a Hauler.")).Value;
+            EnemySetup.haulerCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Hauler)"), 120, new ConfigDescription("Cost of spawning a Hauler.")).Value;
             EnemySetup.nerfPotmobile = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Potmobile"), true, new ConfigDescription("Nerfs NPC Potmobiles and Haulers so they don't instakill you.")).Value;
             EnemySetup.nerfHauler = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Hauler"), true, new ConfigDescription("Nerfs NPC Haulers so they don't instakill you.")).Value;
             stagesPotmobile = base.Config.Bind<string>(new ConfigDefinition("Enemy", "Stage List (Potmobile)"), "golemplains - loop, itgolemplains, goolake, itgoolake, frozenwall, itfrozenwall, snowyforest - loop, drybasin, forgottenhaven, goldshores", new ConfigDescription("What stages Potmobiles will show up on. Add a '- loop' after the stagename to make it only spawn after looping. List of stage names can be found at https://github.com/risk-of-thunder/R2Wiki/wiki/List-of-scene-names")).Value;
@@ -307,8 +307,8 @@ namespace Potmobile
             cb.levelArmor = 0f;
             cb.baseRegen = 1f;
             cb.levelRegen = 0.2f;
-            cb.baseDamage = 14f;
-            cb.levelDamage = 2.8f;
+            cb.baseDamage = 12f;
+            cb.levelDamage = 2.4f;
 
             #region hurtbox
             HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();

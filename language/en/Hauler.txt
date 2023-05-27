@@ -4,8 +4,8 @@
 		"MOFFEINHAULERBODY_NAME" : "Hauler",
 		"MOFFEINHAULERBODY_DESCRIPTION" : "The Hauler is a slow but powerful bruiser that can use its good physics to uniquely navigate the environment. <style=cSub>\r\n\r\n< ! > Pot shot do be doin damage tho.\r\n\r\n< ! > Concussion Bounce should NOT be used to troll in any circumstances!!!!\r\n\r\n< ! > Nitro Rush is very good and very helpful, always use it when it's off cooldown.\r\n\r\n< ! > Reset will always save you. </style>\r\n",
 		"MOFFEINHAULERBODY_LORE" : "Vroom Vroom",
-		"MOFFEINHAULERBODY_SUBTITLE" : "Vroom Vroom",
-		"MOFFEINHAULERBODY_OUTRO_FLAVOR" : "..and so it left, rolling into the distance.",
-		"MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR" : "..and so it vanished, forever stuck upside down.",
+		"MOFFEINHAULERBODY_SUBTITLE" : "Hauler",
+		"MOFFEINHAULERBODY_OUTRO_FLAVOR" : "..and so it left, hauled away in a spaceship.",
+		"MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR" : "..and so it vanished, .",
 	}
 }
