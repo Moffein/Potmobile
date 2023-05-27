@@ -1,5 +1,6 @@
 ﻿using RoR2;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Potmobile.Components
 {
@@ -8,17 +9,20 @@ namespace Potmobile.Components
         public static bool giveVase = true;
         public void Start()
         {
-            CharacterBody cb = base.GetComponent<CharacterBody>();
-            if (cb && cb.inventory)
+            if (NetworkServer.active)
             {
-                if (cb.inventory.GetItemCount(RoR2Content.Items.TeleportWhenOob) <= 0)
+                CharacterBody cb = base.GetComponent<CharacterBody>();
+                if (cb && cb.inventory)
                 {
-                    cb.inventory.GiveItem(RoR2Content.Items.TeleportWhenOob);
-                }
+                    if (cb.inventory.GetItemCount(RoR2Content.Items.TeleportWhenOob) <= 0)
+                    {
+                        cb.inventory.GiveItem(RoR2Content.Items.TeleportWhenOob);
+                    }
 
-                if (giveVase && cb.inventory.currentEquipmentIndex == EquipmentIndex.None)
-                {
-                    cb.inventory.SetEquipmentIndex(RoR2Content.Equipment.Gateway.equipmentIndex);
+                    if (giveVase && cb.inventory.currentEquipmentIndex == EquipmentIndex.None)
+                    {
+                        cb.inventory.SetEquipmentIndex(RoR2Content.Equipment.Gateway.equipmentIndex);
+                    }
                 }
             }
         }
