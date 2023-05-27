@@ -35,6 +35,7 @@ namespace Potmobile
         public void Awake()
         {
             pluginInfo = Info;
+            Assets.Init();
             ReadConfig();
             Tokens.Init();
             DamageTypeSetup.Init();
