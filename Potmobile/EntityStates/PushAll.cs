@@ -9,7 +9,6 @@ namespace EntityStates.MoffeinPotmobile.Weapon
     {
         public static GameObject effectPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerMineExplosion.prefab").WaitForCompletion();
         public static float force = 4500f;
-        public static Vector3 bonusForce = new Vector3(0f, 1000f, 0f);
         public static float baseDuration = 0.5f;
         public static float jumpVelocity = 32f;
         public static float radius = 12f;
@@ -35,7 +34,7 @@ namespace EntityStates.MoffeinPotmobile.Weapon
                     canRejectForce = false,
                     attackerFiltering = AttackerFiltering.NeverHitSelf,
                     baseForce = force,
-                    bonusForce = bonusForce,
+                    bonusForce = Mathf.Min(1000f, force) * Vector3.up,
                     falloffModel = BlastAttack.FalloffModel.None,
                     crit = false,
                     losType = BlastAttack.LoSType.None,

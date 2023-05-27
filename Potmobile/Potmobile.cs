@@ -29,6 +29,9 @@ namespace Potmobile
         public static List<StageSpawnInfo> StageList = new List<StageSpawnInfo>();
         public static bool fixJumpPad = true;
 
+        public static int secondaryStocks, utilityStocks, specialStocks;
+        public static float secondaryCooldown, utilityCooldown, specialCooldown, primaryRadius;
+
         public void Awake()
         {
             pluginInfo = Info;
@@ -52,7 +55,25 @@ namespace Potmobile
 
             sortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position"), 9999f, new ConfigDescription("Position in the Survivor Select menu.")).Value;
             GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), false, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
-            EntityStates.MoffeinPotmobile.Weapon.FireCannon.enableICBMSynergy = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Primary ICBM Synergy"), true, new ConfigDescription("Primary is affected by ICBM.")).Value;
+
+            EntityStates.MoffeinPotmobile.Weapon.FireCannon.enableICBMSynergy = base.Config.Bind<bool>(new ConfigDefinition("Stats", "Primary - ICBM Synergy"), true, new ConfigDescription("Primary is affected by ICBM.")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.FireCannon.damageCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Damage Coefficient"), 10f, new ConfigDescription("How much damage this attack deals. (changes do not show up in skill description)")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.FireCannon.baseDuration = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Duration"), 1.5f, new ConfigDescription("How long it takes to fire each shot.")).Value;
+            primaryRadius = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Blast Radius"), 8f, new ConfigDescription("Blast radius of the primary attack.")).Value;
+
+            EntityStates.MoffeinPotmobile.Weapon.PushAll.jumpVelocity = base.Config.Bind<float>(new ConfigDefinition("Stats", "Secondary - Bounce Velocity"), 32f, new ConfigDescription("Jump power of vertical bounce.")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.PushAll.radius = base.Config.Bind<float>(new ConfigDefinition("Stats", "Secondary - Push Radius"), 12f, new ConfigDescription("Radius of push effect against enemies.")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.PushAll.force = base.Config.Bind<float>(new ConfigDefinition("Stats", "Secondary - Push Force"), 4500f, new ConfigDescription("Power of push effect.")).Value;
+            secondaryStocks = base.Config.Bind<int>(new ConfigDefinition("Stats", "Secondary Stocks"), 1, new ConfigDescription("How many charges this skill has.")).Value;
+            secondaryCooldown = base.Config.Bind<float>(new ConfigDefinition("Stats", "Secondary Cooldown"), 5f, new ConfigDescription("How long this skill takes to recharge.")).Value;
+
+            EntityStates.MoffeinPotmobile.Boost.Boost.baseDuration = base.Config.Bind<float>(new ConfigDefinition("Stats", "Utility - Boost Duration"), 2.5f, new ConfigDescription("Length of Nitro Rush.")).Value;
+            EntityStates.MoffeinPotmobile.Boost.Boost.forceMultiplier = base.Config.Bind<float>(new ConfigDefinition("Stats", "Utility - Speed Multiplier"), 2f, new ConfigDescription("Speed multiplier while using Nitro Rush.")).Value;
+            utilityStocks = base.Config.Bind<int>(new ConfigDefinition("Stats", "Utility Stocks"), 1, new ConfigDescription("How many charges this skill has.")).Value;
+            utilityCooldown = base.Config.Bind<float>(new ConfigDefinition("Stats", "Utility Cooldown"), 10f, new ConfigDescription("How long this skill takes to recharge.")).Value;
+
+            specialStocks = base.Config.Bind<int>(new ConfigDefinition("Stats", "Special Stocks"), 1, new ConfigDescription("How many charges this skill has.")).Value;
+            specialCooldown = base.Config.Bind<float>(new ConfigDefinition("Stats", "Special Cooldown"), 5f, new ConfigDescription("How long this skill takes to recharge.")).Value;
 
             EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles to the enemy spawn pool.")).Value;
             EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles to the Dissonance spawn pool if the enemy is enabled.")).Value;
