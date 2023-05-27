@@ -18,7 +18,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api.damagetype")]
     [BepInDependency("com.bepis.r2api.loadout")]
     [BepInDependency("com.bepis.r2api.recalculatestats")]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.1.0")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.1.1")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class Potmobile : BaseUnityPlugin
     {
@@ -66,7 +66,7 @@ namespace Potmobile
         private void ReadConfig()
         {
             fixJumpPad = base.Config.Bind<bool>(new ConfigDefinition("General", "Fix Jump Pads"), true, new ConfigDescription("Fixes Potmobiles ignoring jump pads.")).Value;
-            fixJumpPad = base.Config.Bind<bool>(new ConfigDefinition("General", "Allow Reverse"), true, new ConfigDescription("Allow Potmobiles to reverse.")).Value;
+            SpeedController.allowReverse = base.Config.Bind<bool>(new ConfigDefinition("General", "Allow Reverse"), true, new ConfigDescription("Allow Potmobiles to reverse.")).Value;
 
             potSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Potmobile)"), 9999f, new ConfigDescription("Position of Potmobile in the Survivor Select menu.")).Value;
             haulSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Hauler)"), 10000f, new ConfigDescription("Position of Hauler in the Survivor Select menu.")).Value;
