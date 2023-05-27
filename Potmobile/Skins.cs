@@ -10,12 +10,10 @@ namespace Potmobile
     //Based off of HenryMod code.
     public class Skins
     {
-        private static bool initialized = false;
 
         public static void InitSkins(GameObject bodyPrefab)
         {
-            if (initialized || !bodyPrefab) return;
-            initialized = true;
+            if (!bodyPrefab) return;
 
             GameObject model = bodyPrefab.GetComponentInChildren<ModelLocator>().modelTransform.gameObject;
             CharacterModel characterModel = model.GetComponent<CharacterModel>();
@@ -25,9 +23,13 @@ namespace Potmobile
 
             ChildLocator childLocator = model.GetComponent<ChildLocator>();
 
-            SkinnedMeshRenderer mainRenderer = characterModel.mainSkinnedMeshRenderer;
-
-            CharacterModel.RendererInfo[] defaultRenderers = characterModel.baseRendererInfos;
+            SkinnedMeshRenderer mainRenderer = null;
+            CharacterModel.RendererInfo[] defaultRenderers = null;
+            if (characterModel)
+            {
+                mainRenderer = characterModel.mainSkinnedMeshRenderer;
+                defaultRenderers = characterModel.baseRendererInfos;
+            }
 
             List<SkinDef> skins = new List<SkinDef>();
 

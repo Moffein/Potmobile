@@ -10,12 +10,9 @@ namespace Potmobile
 {
     public static class MasterSetup
     {
-        private static bool initialized = false;
-        public static void Init()
+        public static void CreatePotmobileMaster()
         {
-            if (initialized) return;
-            initialized = true;
-
+            if (PotmobileContent.PotmobileMasterObject) return;
             GameObject masterObject = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoMonsterMaster.prefab").WaitForCompletion().InstantiateClone("MoffeinPotmobileMaster", true);
             CharacterMaster cm = masterObject.GetComponent<CharacterMaster>();
             cm.bodyPrefab = PotmobileContent.PotmobileBodyObject;
@@ -118,6 +115,113 @@ namespace Potmobile
                 null);
 
             PotmobileContent.PotmobileMasterObject = masterObject;
+        }
+
+        public static void CreateHaulerMaster()
+        {
+            if (PotmobileContent.HaulerMasterObject) return;
+            GameObject masterObject = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoMonsterMaster.prefab").WaitForCompletion().InstantiateClone("MoffeinHaulerMaster", true);
+            CharacterMaster cm = masterObject.GetComponent<CharacterMaster>();
+            cm.bodyPrefab = PotmobileContent.HaulerBodyObject;
+
+            RemoveAISkillDrivers(masterObject);
+
+            AddAISkillDriver(masterObject, "Reset", SkillSlot.Special, null,
+                false, false,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                0f, Mathf.Infinity,
+                false, false, false, -1,
+                AISkillDriver.TargetType.CurrentEnemy,
+                false, false, false,
+                AISkillDriver.MovementType.ChaseMoveTarget, 1f,
+                AISkillDriver.AimType.AtCurrentEnemy,
+                false,
+                true,
+                false,
+                AISkillDriver.ButtonPressType.Hold,
+                0.25f,
+                false,
+                true,
+                null);
+
+            AddAISkillDriver(masterObject, "Boost", SkillSlot.Utility, null,
+                false, false,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                50f, Mathf.Infinity,
+                false, false, false, -1,
+                AISkillDriver.TargetType.CurrentEnemy,
+                false, false, false,
+                AISkillDriver.MovementType.ChaseMoveTarget, 1f,
+                AISkillDriver.AimType.AtCurrentEnemy,
+                false,
+                true,
+                false,
+                AISkillDriver.ButtonPressType.Hold,
+                0.25f,
+                false,
+                true,
+                null);
+
+            AddAISkillDriver(masterObject, "Bounce", SkillSlot.Secondary, null,
+                true, false,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                0f, 12f,
+                false, false, false, -1,
+                AISkillDriver.TargetType.CurrentEnemy,
+                false, false, false,
+                AISkillDriver.MovementType.ChaseMoveTarget, 1f,
+                AISkillDriver.AimType.AtCurrentEnemy,
+                false,
+                false,
+                false,
+                AISkillDriver.ButtonPressType.Hold,
+                0.25f,
+                false,
+                true,
+                null);
+
+            AddAISkillDriver(masterObject, "Primary", SkillSlot.Primary, null,
+                true, false,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                0f, 120f,
+                false, false, false, -1,
+                AISkillDriver.TargetType.CurrentEnemy,
+                false, false, false,
+                AISkillDriver.MovementType.ChaseMoveTarget, 1f,
+                AISkillDriver.AimType.AtCurrentEnemy,
+                false,
+                false,
+                false,
+                AISkillDriver.ButtonPressType.Hold,
+                1f,
+                false,
+                false,
+                null);
+
+            AddAISkillDriver(masterObject, "Chase", SkillSlot.None, null,
+                false, false,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                Mathf.NegativeInfinity, Mathf.Infinity,
+                0f, Mathf.Infinity,
+                false, false, false, -1,
+                AISkillDriver.TargetType.CurrentEnemy,
+                false, false, false,
+                AISkillDriver.MovementType.ChaseMoveTarget, 1f,
+                AISkillDriver.AimType.AtCurrentEnemy,
+                false,
+                true,
+                false,
+                AISkillDriver.ButtonPressType.Abstain,
+                -1,
+                false,
+                false,
+                null);
+
+            PotmobileContent.HaulerMasterObject = masterObject;
         }
 
         private static void RemoveAISkillDrivers(GameObject masterObject)

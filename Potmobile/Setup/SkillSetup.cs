@@ -19,6 +19,7 @@ namespace Potmobile
             initialized = true;
 
             SkillLocator skillLocator = PotmobileContent.PotmobileBodyObject.GetComponent<SkillLocator>();
+            CreateSkillFamilies(PotmobileContent.PotmobileBodyObject, true);
             BuildPrimary(skillLocator);
             BuildSecondary(skillLocator);
             BuildUtility(skillLocator);
@@ -28,10 +29,9 @@ namespace Potmobile
 
         private static void BuildPrimary(SkillLocator skillLocator)
         {
-            CreateSkillFamilies(PotmobileContent.PotmobileBodyObject, true);
 
             SkillDef primaryDef = SkillDef.CreateInstance<SkillDef>();
-            primaryDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Weapon.FireCannon));
+            primaryDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Weapon.FirePotCannon));
             primaryDef.baseRechargeInterval = 0f;
             primaryDef.skillNameToken = "MOFFEINPOTMOBILEBODY_PRIMARY_NAME";
             primaryDef.skillDescriptionToken = "MOFFEINPOTMOBILEBODY_PRIMARY_DESCRIPTION";
@@ -52,9 +52,9 @@ namespace Potmobile
             (primaryDef as ScriptableObject).name = primaryDef.skillName;
 
             PotmobileContent.skillDefs.Add(primaryDef);
-            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.FireCannon));
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.FirePotCannon));
             AddSkillToFamily(skillLocator.primary.skillFamily, primaryDef);
-            PotmobileContent.SkillDefs.FireCannon = primaryDef;
+            PotmobileContent.SkillDefs.FirePotCannon = primaryDef;
 
             GameObject projectilePrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherProjectile.prefab").WaitForCompletion().InstantiateClone("MoffeinPotmobileRocket", true);
             ProjectileImpactExplosion pie = projectilePrefab.GetComponent<ProjectileImpactExplosion>();
@@ -69,7 +69,7 @@ namespace Potmobile
             pd.damageType = DamageType.ClayGoo;
 
             PotmobileContent.projectilePrefabs.Add(projectilePrefab);
-            EntityStates.MoffeinPotmobile.Weapon.FireCannon.projectilePrefab = projectilePrefab;
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.projectilePrefab = projectilePrefab;
         }
         private static void BuildSecondary(SkillLocator skillLocator)
         {
@@ -158,7 +158,7 @@ namespace Potmobile
             PotmobileContent.SkillDefs.Reset = specialDef;
         }
 
-        private static void CreateSkillFamilies(GameObject targetPrefab, bool destroyExisting = true)
+        public static void CreateSkillFamilies(GameObject targetPrefab, bool destroyExisting = true)
         {
             if (destroyExisting)
             {
@@ -191,7 +191,7 @@ namespace Potmobile
             PotmobileContent.skillFamilies.Add(newFamily);
             return skill;
         }
-        private static void AddSkillToFamily(SkillFamily skillFamily, SkillDef skillDef, UnlockableDef unlockableDef = null)
+        public static void AddSkillToFamily(SkillFamily skillFamily, SkillDef skillDef, UnlockableDef unlockableDef = null)
         {
             Array.Resize(ref skillFamily.variants, skillFamily.variants.Length + 1);
 

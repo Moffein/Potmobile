@@ -4,7 +4,7 @@ using RoR2.Projectile;
 
 namespace EntityStates.MoffeinPotmobile.Weapon
 {
-    public class FireCannon : BaseState
+    public class FirePotCannon : BaseState
     {
         public override void OnEnter()
         {

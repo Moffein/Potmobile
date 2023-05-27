@@ -12,12 +12,20 @@ namespace Potmobile
     public class PotmobileContent : IContentPackProvider
     {
         public static ContentPack content = new ContentPack();
+
         public static SurvivorDef PotmobileSurvivorDef;
         public static GameObject PotmobileBodyObject;
         public static GameObject PotmobileMasterObject;
         public static BodyIndex PotmobileBodyIndex = BodyIndex.None;
         public static DirectorAPI.DirectorCardHolder PotmobileCard;
         public static DirectorAPI.DirectorCardHolder PotmobileLoopCard;
+
+        public static SurvivorDef HaulerSurvivorDef;
+        public static GameObject HaulerBodyObject;
+        public static GameObject HaulerMasterObject;
+        public static BodyIndex HaulerBodyIndex = BodyIndex.None;
+        public static DirectorAPI.DirectorCardHolder HaulerCard;
+        public static DirectorAPI.DirectorCardHolder HaulerLoopCard;
 
         public static List<SkillFamily> skillFamilies = new List<SkillFamily>();
         public static List<SkillDef> skillDefs = new List<SkillDef>();
@@ -31,7 +39,7 @@ namespace Potmobile
 
         public static class SkillDefs
         {
-            public static SkillDef FireCannon;
+            public static SkillDef FirePotCannon;
             public static SkillDef Push;
             public static SkillDef Boost;
             public static SkillDef Reset;
@@ -56,6 +64,10 @@ namespace Potmobile
             if (PotmobileBodyObject) content.bodyPrefabs.Add(new GameObject[] { PotmobileBodyObject });
             if (PotmobileMasterObject) content.masterPrefabs.Add(new GameObject[] { PotmobileMasterObject });
             if (PotmobileSurvivorDef) content.survivorDefs.Add(new SurvivorDef[] { PotmobileSurvivorDef });
+
+            if (HaulerBodyObject) content.bodyPrefabs.Add(new GameObject[] { HaulerBodyObject });
+            if (HaulerMasterObject) content.masterPrefabs.Add(new GameObject[] { HaulerMasterObject });
+            if (HaulerSurvivorDef) content.survivorDefs.Add(new SurvivorDef[] { HaulerSurvivorDef });
 
             content.skillDefs.Add(skillDefs.ToArray());
             content.entityStateTypes.Add(entityStates.ToArray());

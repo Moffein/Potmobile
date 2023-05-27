@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Networking;
 
 namespace Potmobile
 {
@@ -39,12 +38,22 @@ namespace Potmobile
             ReadConfig();
             Tokens.Init();
             DamageTypeSetup.Init();
-            BuildBodyObject();
+
+            //Potmobile
+            BuildPotmobileBodyObject();
             Skins.InitSkins(PotmobileContent.PotmobileBodyObject);
-            CreateSurvivorDef();
+            CreatePotmobileSurvivorDef();
             SkillSetup.Init();
-            MasterSetup.Init();
+            MasterSetup.CreatePotmobileMaster();
             EnemySetup.Init();
+
+            //Hauler
+            BuildHaulerBodyObject();
+            Skins.InitSkins(PotmobileContent.HaulerBodyObject); //Has no CharacterModel, likely incompatible with skins.
+            CreateHaulerSurvivorDef();
+            HaulerSkillSetup();
+            MasterSetup.CreateHaulerMaster();
+
             FixJumpPad();
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
@@ -57,10 +66,10 @@ namespace Potmobile
             sortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position"), 9999f, new ConfigDescription("Position in the Survivor Select menu.")).Value;
             GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), false, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
 
-            EntityStates.MoffeinPotmobile.Weapon.FireCannon.enableICBMSynergy = base.Config.Bind<bool>(new ConfigDefinition("Stats", "Primary - ICBM Synergy"), true, new ConfigDescription("Primary is affected by ICBM.")).Value;
-            EntityStates.MoffeinPotmobile.Weapon.FireCannon.damageCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Damage Coefficient"), 10f, new ConfigDescription("How much damage this attack deals. (changes do not show up in skill description)")).Value;
-            EntityStates.MoffeinPotmobile.Weapon.FireCannon.force = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Force"), 2500f, new ConfigDescription("Knockback power against enemies.")).Value;
-            EntityStates.MoffeinPotmobile.Weapon.FireCannon.baseDuration = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Duration"), 1.5f, new ConfigDescription("How long it takes to fire each shot.")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.enableICBMSynergy = base.Config.Bind<bool>(new ConfigDefinition("Stats", "Primary - ICBM Synergy"), true, new ConfigDescription("Primary is affected by ICBM.")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.damageCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Damage Coefficient"), 10f, new ConfigDescription("How much damage this attack deals. (changes do not show up in skill description)")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.force = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Force"), 2500f, new ConfigDescription("Knockback power against enemies.")).Value;
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.baseDuration = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Duration"), 1.5f, new ConfigDescription("How long it takes to fire each shot.")).Value;
             primaryRadius = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Blast Radius"), 8f, new ConfigDescription("Blast radius of the primary attack.")).Value;
 
             EntityStates.MoffeinPotmobile.Weapon.PushAll.jumpVelocity = base.Config.Bind<float>(new ConfigDefinition("Stats", "Secondary - Bounce Velocity"), 32f, new ConfigDescription("Jump power of vertical bounce.")).Value;
@@ -107,7 +116,7 @@ namespace Potmobile
             EnemySetup.SetSpawns(); //Run this here after all the custom stages have been loaded.
         }
 
-        private void BuildBodyObject()
+        private void BuildPotmobileBodyObject()
         {
             if (PotmobileContent.PotmobileBodyObject) return;
 
@@ -214,8 +223,7 @@ namespace Potmobile
 
             PotmobileContent.PotmobileBodyObject = bodyObject;
         }
-
-        private void CreateSurvivorDef()
+        private void CreatePotmobileSurvivorDef()
         {
             GameObject displayObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileDisplay", false);
             displayObject = displayObject.GetComponent<ModelLocator>().modelTransform.gameObject;
@@ -232,6 +240,147 @@ namespace Potmobile
             sd.outroFlavorToken = "MOFFEINPOTMOBILEBODY_OUTRO_FLAVOR";
             (sd as ScriptableObject).name = sd.cachedName;
             PotmobileContent.PotmobileSurvivorDef = sd;
+        }
+
+        private void BuildHaulerBodyObject()
+        {
+            if (PotmobileContent.HaulerBodyObject) return;
+            GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerBody", true);
+
+            bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
+            bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
+            bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
+
+            //Fix interactor
+            Interactor interactor = bodyObject.AddComponent<Interactor>();
+            interactor.maxInteractionDistance = 6f;
+
+            InteractionDriver id = bodyObject.AddComponent<InteractionDriver>();
+            id.highlightInteractor = true;
+
+            //Fix Out of Bounds teleport
+            bodyObject.layer = 0;
+
+            CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
+            cb.bodyColor = new Color32(220, 220, 200, 255); //todo: change
+            cb.name = "MoffeinHaulerBody";
+            cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
+            cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
+            cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
+            //cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texModIcon.png");
+
+            cb.baseNameToken = "MOFFEINHAULERBODY_NAME";
+            cb.subtitleNameToken = "MOFFEINHAULERBODY_SUBTITLE";
+            cb.baseMaxHealth = 480f;
+            cb.levelMaxHealth = 144f;
+            cb.baseArmor = 0;
+            cb.levelArmor = 0f;
+            cb.baseRegen = 1f;
+            cb.levelRegen = 0.2f;
+            cb.baseDamage = 12f;
+            cb.levelDamage = 2.4f;
+
+            #region hurtbox
+            HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();
+            for (int i = 0; i < existingHurtboxes.Length; i++)
+            {
+                Destroy(existingHurtboxes[i]);
+            }
+            HurtBoxGroup existingHBG = bodyObject.GetComponentInChildren<HurtBoxGroup>();
+            if (existingHBG) Destroy(existingHBG);
+
+            ModelLocator modelLocator = bodyObject.GetComponent<ModelLocator>();
+            modelLocator.modelTransform.gameObject.layer = LayerIndex.entityPrecise.intVal;
+
+            GameObject hbObject = modelLocator.modelTransform.gameObject;
+            BoxCollider bc = hbObject.AddComponent<BoxCollider>();
+            bc.center = new Vector3(0f, 0f, 0f);
+            bc.size = new Vector3(3.5f, 2f, 3.5f);
+            HurtBoxGroup goHurtBoxGroup = hbObject.AddComponent<HurtBoxGroup>();
+
+            HurtBox goHurtBox = hbObject.AddComponent<HurtBox>();
+            goHurtBox.isBullseye = true;
+            goHurtBox.isSniperTarget = true;
+            goHurtBox.healthComponent = bodyObject.GetComponent<HealthComponent>();
+            goHurtBox.damageModifier = HurtBox.DamageModifier.Normal;
+            goHurtBox.hurtBoxGroup = goHurtBoxGroup;
+            goHurtBox.indexInGroup = 0;
+
+            HurtBox[] goHurtBoxArray = new HurtBox[]
+            {
+                goHurtBox
+            };
+
+            goHurtBoxGroup.bullseyeCount = 1;
+            goHurtBoxGroup.hurtBoxes = goHurtBoxArray;
+            goHurtBoxGroup.mainHurtBox = goHurtBox;
+            #endregion
+
+            #region statemachines
+            NetworkStateMachine nsm = bodyObject.GetComponent<NetworkStateMachine>();
+            if (!nsm)
+            {
+                nsm = bodyObject.AddComponent<NetworkStateMachine>();
+                nsm.stateMachines = bodyObject.GetComponents<EntityStateMachine>();
+            }
+
+            EntityStateMachine weaponMachine = bodyObject.AddComponent<EntityStateMachine>();
+            weaponMachine.customName = "Weapon";
+            weaponMachine.initialStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
+            weaponMachine.mainStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
+            nsm.stateMachines.Append(weaponMachine).ToArray();
+
+            EntityStateMachine boostMachine = bodyObject.AddComponent<EntityStateMachine>();
+            boostMachine.customName = "Boost";
+            boostMachine.initialStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
+            boostMachine.mainStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
+            nsm.stateMachines.Append(boostMachine).ToArray();
+            #endregion
+
+            //Fix freeze nullref spam
+            SetStateOnHurt ssoh = bodyObject.AddComponent<SetStateOnHurt>();
+            ssoh.canBeFrozen = true;
+            ssoh.canBeHitStunned = false;
+            ssoh.canBeStunned = false;
+            ssoh.idleStateMachine = new EntityStateMachine[] { weaponMachine, boostMachine };
+            ssoh.targetStateMachine = EntityStateMachine.FindByCustomName(bodyObject, "Body");
+
+            //Fix Potmobiles living after death
+            CharacterDeathBehavior cdb = bodyObject.AddComponent<CharacterDeathBehavior>();
+            cdb.deathState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.PotmobileDeath));
+            cdb.deathStateMachine = ssoh.targetStateMachine;
+            cdb.idleStateMachine = ssoh.idleStateMachine;
+
+            PotmobileContent.HaulerBodyObject = bodyObject;
+        }
+
+        private void CreateHaulerSurvivorDef()
+        {
+            GameObject displayObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerDisplay", false);
+            displayObject = displayObject.GetComponent<ModelLocator>().modelTransform.gameObject;
+            displayObject.transform.localScale *= 0.25f;
+
+            SurvivorDef sd = ScriptableObject.CreateInstance<SurvivorDef>();
+            sd.cachedName = "MoffeinHauler";
+            sd.bodyPrefab = PotmobileContent.HaulerBodyObject;
+            sd.hidden = false;
+            sd.desiredSortPosition = sortPosition;
+            sd.descriptionToken = "MOFFEINHAULERBODY_DESCRIPTION";
+            sd.displayPrefab = displayObject;
+            sd.mainEndingEscapeFailureFlavorToken = "MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";
+            sd.outroFlavorToken = "MOFFEINHAULERBODY_OUTRO_FLAVOR";
+            (sd as ScriptableObject).name = sd.cachedName;
+            PotmobileContent.HaulerSurvivorDef = sd;
+        }
+
+        private void HaulerSkillSetup()
+        {
+            SkillLocator skillLocator = PotmobileContent.HaulerBodyObject.GetComponent<SkillLocator>();
+            SkillSetup.CreateSkillFamilies(PotmobileContent.HaulerBodyObject, true);
+            SkillSetup.AddSkillToFamily(skillLocator.primary.skillFamily, PotmobileContent.SkillDefs.FirePotCannon);  //TODO: unique primary
+            SkillSetup.AddSkillToFamily(skillLocator.secondary.skillFamily, PotmobileContent.SkillDefs.Push);
+            SkillSetup.AddSkillToFamily(skillLocator.utility.skillFamily, PotmobileContent.SkillDefs.Boost);
+            SkillSetup.AddSkillToFamily(skillLocator.special.skillFamily, PotmobileContent.SkillDefs.Reset);
         }
 
         private void FixJumpPad()
