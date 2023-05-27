@@ -24,8 +24,10 @@ namespace Potmobile
     {
         public static PluginInfo pluginInfo;
         public static float sortPosition = 9999f;
-        public static string stages = string.Empty;
-        public static List<StageSpawnInfo> StageList = new List<StageSpawnInfo>();
+        public static string stagesPotmobile = string.Empty;
+        public static string stagesHauler = string.Empty;
+        public static List<StageSpawnInfo> StageListPotmobile = new List<StageSpawnInfo>();
+        public static List<StageSpawnInfo> StageListHauler = new List<StageSpawnInfo>();
         public static bool fixJumpPad = true;
 
         public static int secondaryStocks, utilityStocks, specialStocks;
@@ -45,7 +47,6 @@ namespace Potmobile
             CreatePotmobileSurvivorDef();
             SkillSetup.Init();
             MasterSetup.CreatePotmobileMaster();
-            EnemySetup.Init();
 
             //Hauler
             BuildHaulerBodyObject();
@@ -55,6 +56,8 @@ namespace Potmobile
             MasterSetup.CreateHaulerMaster();
 
             FixJumpPad();
+            EnemySetup.Init();
+
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
         }
@@ -86,15 +89,18 @@ namespace Potmobile
             specialStocks = base.Config.Bind<int>(new ConfigDefinition("Stats", "Special Stocks"), 1, new ConfigDescription("How many charges this skill has.")).Value;
             specialCooldown = base.Config.Bind<float>(new ConfigDefinition("Stats", "Special Cooldown"), 5f, new ConfigDescription("How long this skill takes to recharge.")).Value;
 
-            EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles to the enemy spawn pool.")).Value;
-            EnemySetup.directorCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost"), 80, new ConfigDescription("Cost of spawning an enemy Potmobile.")).Value;
-            EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles to the Dissonance spawn pool if the enemy is enabled.")).Value;
-            EnemySetup.nerfEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Enemy"), true, new ConfigDescription("Nerfs NPC Potmobiles so they don't instakill you.")).Value;
-            stages = base.Config.Bind<string>(new ConfigDefinition("Enemy", "Stage List"), "golemplains - loop, itgolemplains, goolake, itgoolake, frozenwall, itfrozenwall, snowyforest - loop, goldshores, drybasin, forgottenhaven", new ConfigDescription("What stages the monster will show up on. Add a '- loop' after the stagename to make it only spawn after looping. List of stage names can be found at https://github.com/risk-of-thunder/R2Wiki/wiki/List-of-scene-names")).Value;
+            EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles and Haulers to the enemy spawn pool.")).Value;
+            EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles and Haulers to the Dissonance spawn pool if the enemy is enabled.")).Value;
+            EnemySetup.potmobileCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Potmobile)"), 80, new ConfigDescription("Cost of spawning a Potmobile.")).Value;
+            EnemySetup.haulerCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Hauler)"), 80, new ConfigDescription("Cost of spawning a Hauler.")).Value;
+            EnemySetup.nerfPotmobile = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Potmobile"), true, new ConfigDescription("Nerfs NPC Potmobiles and Haulers so they don't instakill you.")).Value;
+            EnemySetup.nerfHauler = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Nerf Hauler"), true, new ConfigDescription("Nerfs NPC Haulers so they don't instakill you.")).Value;
+            stagesPotmobile = base.Config.Bind<string>(new ConfigDefinition("Enemy", "Stage List (Potmobile)"), "golemplains - loop, itgolemplains, goolake, itgoolake, frozenwall, itfrozenwall, snowyforest - loop, drybasin, forgottenhaven, goldshores", new ConfigDescription("What stages Potmobiles will show up on. Add a '- loop' after the stagename to make it only spawn after looping. List of stage names can be found at https://github.com/risk-of-thunder/R2Wiki/wiki/List-of-scene-names")).Value;
+            stagesHauler = base.Config.Bind<string>(new ConfigDefinition("Enemy", "Stage List (Hauler)"), "golemplains - loop, itgolemplains, goolake, itgoolake, frozenwall, itfrozenwall, snowyforest - loop, drybasin, forgottenhaven, goldshores", new ConfigDescription("What stages Haulers will show up on. Add a '- loop' after the stagename to make it only spawn after looping. List of stage names can be found at https://github.com/risk-of-thunder/R2Wiki/wiki/List-of-scene-names")).Value;
 
             //parse stage
-            stages = new string(stages.ToCharArray().Where(c => !System.Char.IsWhiteSpace(c)).ToArray());
-            string[] splitStages = stages.Split(',');
+            stagesPotmobile = new string(stagesPotmobile.ToCharArray().Where(c => !System.Char.IsWhiteSpace(c)).ToArray());
+            string[] splitStages = stagesPotmobile.Split(',');
             foreach (string str in splitStages)
             {
                 string[] current = str.Split('-');
@@ -106,13 +112,30 @@ namespace Potmobile
                     minStages = 5;
                 }
 
-                StageList.Add(new StageSpawnInfo(name, minStages));
+                StageListPotmobile.Add(new StageSpawnInfo(name, minStages));
+            }
+
+            stagesHauler = new string(stagesHauler.ToCharArray().Where(c => !System.Char.IsWhiteSpace(c)).ToArray());
+            string[] splitStages2 = stagesHauler.Split(',');
+            foreach (string str in splitStages2)
+            {
+                string[] current = str.Split('-');
+
+                string name = current[0];
+                int minStages = 0;
+                if (current.Length > 1)
+                {
+                    minStages = 5;
+                }
+
+                StageListHauler.Add(new StageSpawnInfo(name, minStages));
             }
         }
 
         private void LateSetup()
         {
             PotmobileContent.PotmobileBodyIndex = BodyCatalog.FindBodyIndex("MoffeinPotmobileBody");
+            PotmobileContent.HaulerBodyIndex = BodyCatalog.FindBodyIndex("MoffeinHaulerBody");
             EnemySetup.SetSpawns(); //Run this here after all the custom stages have been loaded.
         }
 

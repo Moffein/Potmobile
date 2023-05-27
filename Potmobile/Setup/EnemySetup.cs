@@ -8,7 +8,8 @@ namespace Potmobile
 {
     public static class EnemySetup
     {
-        public static bool nerfEnemy = true;
+        public static bool nerfPotmobile = true;
+        public static bool nerfHauler = true;
 
         private static bool initialized = false;
         private static bool setSpawns = false;
@@ -16,7 +17,8 @@ namespace Potmobile
         public static bool enableEnemy = false;
         public static bool enableDissonance = true;
 
-        public static int directorCost = 80;
+        public static int potmobileCost = 80;
+        public static int haulerCost = 80;
 
         public static void Init()
         {
@@ -31,7 +33,7 @@ namespace Potmobile
         {
             RecalculateStatsAPI.GetStatCoefficients += (sender, args) =>
             {
-                if (sender.bodyIndex == PotmobileContent.PotmobileBodyIndex && nerfEnemy)
+                if ((sender.bodyIndex == PotmobileContent.PotmobileBodyIndex && nerfPotmobile) || (sender.bodyIndex == PotmobileContent.HaulerBodyIndex && nerfHauler))
                 {
                     if (!sender.isPlayerControlled && sender.teamComponent && sender.teamComponent.teamIndex != TeamIndex.Player)
                     {
@@ -53,7 +55,7 @@ namespace Potmobile
             potCSC.nodeGraphType = MapNodeGroup.GraphType.Ground;
             potCSC.requiredFlags = NodeFlags.None;
             potCSC.forbiddenFlags = NodeFlags.NoCharacterSpawn;
-            potCSC.directorCreditCost = directorCost;
+            potCSC.directorCreditCost = potmobileCost;
             potCSC.occupyPosition = false;
             potCSC.loadout = new SerializableLoadout();
             potCSC.noElites = false;
@@ -89,6 +91,51 @@ namespace Potmobile
 
             PotmobileContent.PotmobileCard = potCard;
             PotmobileContent.PotmobileLoopCard = potLoopCard;
+
+            CharacterSpawnCard haulCSC = ScriptableObject.CreateInstance<CharacterSpawnCard>();
+            haulCSC.name = "cscHauler";
+            haulCSC.prefab = PotmobileContent.HaulerMasterObject;
+            haulCSC.sendOverNetwork = true;
+            haulCSC.hullSize = HullClassification.Golem;
+            haulCSC.nodeGraphType = MapNodeGroup.GraphType.Ground;
+            haulCSC.requiredFlags = NodeFlags.None;
+            haulCSC.forbiddenFlags = NodeFlags.NoCharacterSpawn;
+            haulCSC.directorCreditCost = potmobileCost;
+            haulCSC.occupyPosition = false;
+            haulCSC.loadout = new SerializableLoadout();
+            haulCSC.noElites = false;
+            haulCSC.forbiddenAsBoss = false;
+
+            DirectorCard haulDC = new DirectorCard
+            {
+                spawnCard = haulCSC,
+                selectionWeight = 1,
+                preventOverhead = false,
+                minimumStageCompletions = 0,
+                spawnDistance = DirectorCore.MonsterSpawnDistance.Standard
+            };
+            DirectorAPI.DirectorCardHolder haulCard = new DirectorAPI.DirectorCardHolder
+            {
+                Card = haulDC,
+                MonsterCategory = DirectorAPI.MonsterCategory.Minibosses
+            };
+
+            DirectorCard haulLoopDC = new DirectorCard
+            {
+                spawnCard = haulCSC,
+                selectionWeight = 1,
+                preventOverhead = false,
+                minimumStageCompletions = 5,
+                spawnDistance = DirectorCore.MonsterSpawnDistance.Standard
+            };
+            DirectorAPI.DirectorCardHolder haulLoopCard = new DirectorAPI.DirectorCardHolder
+            {
+                Card = haulLoopDC,
+                MonsterCategory = DirectorAPI.MonsterCategory.Minibosses
+            };
+
+            PotmobileContent.HaulerCard = haulCard;
+            PotmobileContent.HaulerLoopCard = haulLoopCard;
         }
 
         public static void SetSpawns()
@@ -107,9 +154,19 @@ namespace Potmobile
                 }
             }
 
-            foreach (Potmobile.StageSpawnInfo ssi in Potmobile.StageList)
+            foreach (Potmobile.StageSpawnInfo ssi in Potmobile.StageListPotmobile)
             {
                 DirectorAPI.DirectorCardHolder toAdd = ssi.GetMinStages() == 0 ? PotmobileContent.PotmobileCard : PotmobileContent.PotmobileLoopCard;
+
+                SceneDef sd = ScriptableObject.CreateInstance<SceneDef>();
+                sd.baseSceneNameOverride = ssi.GetStageName();
+
+                DirectorAPI.Helpers.AddNewMonsterToStage(toAdd, false, DirectorAPI.GetStageEnumFromSceneDef(sd), ssi.GetStageName());
+            }
+
+            foreach (Potmobile.StageSpawnInfo ssi in Potmobile.StageListHauler)
+            {
+                DirectorAPI.DirectorCardHolder toAdd = ssi.GetMinStages() == 0 ? PotmobileContent.HaulerCard : PotmobileContent.HaulerLoopCard;
 
                 SceneDef sd = ScriptableObject.CreateInstance<SceneDef>();
                 sd.baseSceneNameOverride = ssi.GetStageName();
