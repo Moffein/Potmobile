@@ -33,7 +33,7 @@ namespace Potmobile
 
             #region DefaultSkin
             SkinDef defaultSkin = CreateSkinDef("DEFAULT_SKIN",
-                Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion(),
+                Assets.assetBundle.LoadAsset<Sprite>("texModIcon.png"),
                 defaultRenderers,
                 mainRenderer,
                 model);

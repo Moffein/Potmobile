@@ -133,6 +133,7 @@ namespace Potmobile
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
             cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
+            cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texModIcon.png");
 
             cb.baseNameToken = "MOFFEINPOTMOBILEBODY_NAME";
             cb.subtitleNameToken = "MOFFEINPOTMOBILEBODY_SUBTITLE";
