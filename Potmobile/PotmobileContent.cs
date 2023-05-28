@@ -35,11 +35,13 @@ namespace Potmobile
         public static class ModdedDamageTypes
         {
             public static DamageAPI.ModdedDamageType BonusForceToPotmobile;
+            public static DamageAPI.ModdedDamageType SquashOnKill;
         }
 
         public static class SkillDefs
         {
             public static SkillDef FirePotCannon;
+            public static SkillDef FirePotCannonScepter;
             public static SkillDef Push;
             public static SkillDef Boost;
             public static SkillDef Reset;

@@ -14,6 +14,7 @@ namespace Potmobile
             if (initialized) return;
             initialized = true;
             PotmobileContent.ModdedDamageTypes.BonusForceToPotmobile = DamageAPI.ReserveDamageType();
+            PotmobileContent.ModdedDamageTypes.SquashOnKill = DamageAPI.ReserveDamageType();
 
             On.RoR2.HealthComponent.TakeDamage += HealthComponent_TakeDamage;
         }
@@ -27,6 +28,25 @@ namespace Potmobile
                     if (self.body.bodyIndex == PotmobileContent.PotmobileBodyIndex)
                     {
                         damageInfo.force *= 4f;
+                    }
+                }
+
+                if (damageInfo.attacker)
+                {
+                    if (damageInfo.HasModdedDamageType(PotmobileContent.ModdedDamageTypes.SquashOnKill))
+                    {
+                        PotmobileNetworkComponent pnc = damageInfo.attacker.GetComponent<PotmobileNetworkComponent>();
+                        if (pnc)
+                        {
+                            if (self.body.master)
+                            {
+                                NetworkIdentity ni = self.body.master.GetComponent<NetworkIdentity>();
+                                if (ni)
+                                {
+                                    pnc.SquashEnemy(ni.netId.Value);
+                                }
+                            }
+                        }
                     }
                 }
             }

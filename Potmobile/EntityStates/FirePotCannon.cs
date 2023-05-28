@@ -13,6 +13,9 @@ namespace EntityStates.MoffeinPotmobile.Weapon
             Ray aimRay = base.GetAimRay();
             //base.StartAimMode(aimRay, 2f, false);
             Util.PlaySound("Play_MULT_m1_grenade_launcher_shoot", base.gameObject);
+
+            ModifyStats();
+
             if (base.isAuthority)
             {
                 int icbmCount = 0;
@@ -42,15 +45,21 @@ namespace EntityStates.MoffeinPotmobile.Weapon
                     Ray aimRay2 = new Ray(aimRay.origin, direction);
                     for (int i = 0; i < 3; i++)
                     {
-                        ProjectileManager.instance.FireProjectile(projectilePrefab, aimRay2.origin, Util.QuaternionSafeLookRotation(aimRay2.direction), base.gameObject, damageMult * this.damageStat * damageCoefficient, (i != 1 ? 0f : force), isCrit, DamageColorIndex.Default, null, -1f);
+                        ProjectileManager.instance.FireProjectile(_projectilePrefabInternal, aimRay2.origin, Util.QuaternionSafeLookRotation(aimRay2.direction), base.gameObject, damageMult * this.damageStat * _damageCoefficientInternal, (i != 1 ? 0f : force), isCrit, DamageColorIndex.Default, null, -1f);
                         aimRay2.direction = rotation * aimRay2.direction;
                     }
                 }
                 else
                 {
-                    ProjectileManager.instance.FireProjectile(projectilePrefab, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageStat * damageCoefficient, 0f, base.RollCrit(), DamageColorIndex.Default, null, -1f);
+                    ProjectileManager.instance.FireProjectile(_projectilePrefabInternal, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageStat * _damageCoefficientInternal, 0f, base.RollCrit(), DamageColorIndex.Default, null, -1f);
                 }
             }
+        }
+
+        public virtual void ModifyStats()
+        {
+            _damageCoefficientInternal = damageCoefficient;
+            _projectilePrefabInternal = projectilePrefab;
         }
 
         public override void FixedUpdate()
@@ -67,6 +76,9 @@ namespace EntityStates.MoffeinPotmobile.Weapon
         {
             return InterruptPriority.Skill;
         }
+
+        protected float _damageCoefficientInternal;
+        protected GameObject _projectilePrefabInternal;
 
         public static bool enableICBMSynergy = true;
         public static GameObject projectilePrefab;

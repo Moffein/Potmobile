@@ -7,6 +7,7 @@ using EntityStates;
 using UnityEngine.AddressableAssets;
 using R2API;
 using RoR2.Projectile;
+using System.Runtime.CompilerServices;
 
 namespace Potmobile
 {
@@ -21,6 +22,7 @@ namespace Potmobile
             SkillLocator skillLocator = PotmobileContent.PotmobileBodyObject.GetComponent<SkillLocator>();
             CreateSkillFamilies(PotmobileContent.PotmobileBodyObject, true);
             BuildPrimary(skillLocator);
+            BuildPrimaryScepter();
             BuildSecondary(skillLocator);
             BuildUtility(skillLocator);
             BuildSpecial(skillLocator);
@@ -71,6 +73,61 @@ namespace Potmobile
             PotmobileContent.projectilePrefabs.Add(projectilePrefab);
             EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.projectilePrefab = projectilePrefab;
         }
+
+        private static void BuildPrimaryScepter()
+        {
+            SkillDef primaryScepterDef = SkillDef.CreateInstance<SkillDef>();
+            primaryScepterDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter));
+            primaryScepterDef.baseRechargeInterval = 0f;
+            primaryScepterDef.skillNameToken = "MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_NAME";
+            primaryScepterDef.skillDescriptionToken = "MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_DESCRIPTION";
+            primaryScepterDef.skillName = "FireCannonScepter";
+            primaryScepterDef.icon = Assets.assetBundle.LoadAsset<Texture2D>("texIconPrimaryScepter.png");
+            primaryScepterDef.baseMaxStock = 1;
+            primaryScepterDef.rechargeStock = 1;
+            primaryScepterDef.beginSkillCooldownOnSkillEnd = false;
+            primaryScepterDef.activationStateMachineName = "Weapon";
+            primaryScepterDef.interruptPriority = InterruptPriority.Any;
+            primaryScepterDef.isCombatSkill = true;
+            primaryScepterDef.cancelSprintingOnActivation = false;
+            primaryScepterDef.canceledFromSprinting = false;
+            primaryScepterDef.mustKeyPress = false;
+            primaryScepterDef.requiredStock = 1;
+            primaryScepterDef.stockToConsume = 1;
+            primaryScepterDef.keywordTokens = new string[] { };
+            (primaryScepterDef as ScriptableObject).name = primaryScepterDef.skillName;
+
+            PotmobileContent.skillDefs.Add(primaryScepterDef);
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter));
+            PotmobileContent.SkillDefs.FirePotCannonScepter = primaryScepterDef;
+
+            GameObject projectilePrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherProjectile.prefab").WaitForCompletion().InstantiateClone("MoffeinPotmobileRocketScepter", true);
+            ProjectileImpactExplosion pie = projectilePrefab.GetComponent<ProjectileImpactExplosion>();
+            pie.blastRadius = Potmobile.primaryRadius * 1.5f;
+            pie.falloffModel = BlastAttack.FalloffModel.None;
+            pie.bonusBlastForce = Vector3.zero;
+
+            ProjectileController pc = projectilePrefab.GetComponent<ProjectileController>();
+            pc.ghostPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayPotProjectileGhost.prefab").WaitForCompletion();
+
+            ProjectileDamage pd = projectilePrefab.GetComponent<ProjectileDamage>();
+            pd.damageType = DamageType.ClayGoo;
+
+            PotmobileContent.projectilePrefabs.Add(projectilePrefab);
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter.projectilePrefab = projectilePrefab;
+
+            if (Potmobile.scepterPluginLoaded) AssignScepter();
+        }
+
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        private static void AssignScepter()
+        {
+            AncientScepter.AncientScepterItem.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinPotmobileBody", SkillSlot.Primary, 0);
+            AncientScepter.AncientScepterItem.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinHaulerBody", SkillSlot.Primary, 0);
+        }
+
+
         private static void BuildSecondary(SkillLocator skillLocator)
         {
             SkillDef secondaryDef = SkillDef.CreateInstance<SkillDef>();

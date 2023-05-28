@@ -11,6 +11,9 @@
 		"MOFFEINPOTMOBILEBODY_PRIMARY_NAME" : "Pot Shot",
 		"MOFFEINPOTMOBILEBODY_PRIMARY_DESCRIPTION" : "Fire an explosive pot for <style=cIsDamage>1000% damage</style>.",
 		
+		"MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_NAME" : "Giga Pot Shot",
+		"MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_DESCRIPTION" : "Fire an explosive pot for <style=cIsDamage>1500% damage</style>.",
+		
 		"MOFFEINPOTMOBILEBODY_SECONDARY_NAME" : "Concussion Bounce",
 		"MOFFEINPOTMOBILEBODY_SECONDARY_DESCRIPTION" : "<style=cIsUtility>Bounce upwards</style> and <style=cIsUtility>push away</style> nearby enemies.",
 		

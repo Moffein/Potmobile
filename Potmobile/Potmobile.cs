@@ -18,10 +18,12 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api.damagetype")]
     [BepInDependency("com.bepis.r2api.loadout")]
     [BepInDependency("com.bepis.r2api.recalculatestats")]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.1.1")]
+    [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class Potmobile : BaseUnityPlugin
     {
+        public static bool scepterPluginLoaded = false;
         public static PluginInfo pluginInfo;
         public static float potSortPosition = 9999f;
         public static float haulSortPosition = 10000f;
@@ -36,6 +38,8 @@ namespace Potmobile
 
         public void Awake()
         {
+            scepterPluginLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.DestroyedClone.AncientScepter");
+
             pluginInfo = Info;
             Assets.Init();
             ReadConfig();
@@ -151,6 +155,7 @@ namespace Potmobile
             bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
+            bodyObject.AddComponent<PotmobileNetworkComponent>();   //Used to squash things
 
             //Fix interactor
             Interactor interactor = bodyObject.AddComponent<Interactor>();
@@ -276,6 +281,7 @@ namespace Potmobile
             bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
+            bodyObject.AddComponent<PotmobileNetworkComponent>();   //Used to squash things
 
             //Fix interactor
             Interactor interactor = bodyObject.AddComponent<Interactor>();
