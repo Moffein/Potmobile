@@ -82,7 +82,7 @@ namespace Potmobile
             primaryScepterDef.skillNameToken = "MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_NAME";
             primaryScepterDef.skillDescriptionToken = "MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_DESCRIPTION";
             primaryScepterDef.skillName = "FireCannonScepter";
-            primaryScepterDef.icon = Assets.assetBundle.LoadAsset<Texture2D>("texIconPrimaryScepter.png");
+            primaryScepterDef.icon = Assets.assetBundle.LoadAsset<Sprite>("texIconPrimaryScepter.png");
             primaryScepterDef.baseMaxStock = 1;
             primaryScepterDef.rechargeStock = 1;
             primaryScepterDef.beginSkillCooldownOnSkillEnd = false;

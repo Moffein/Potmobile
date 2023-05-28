@@ -36,6 +36,7 @@ namespace Potmobile
         {
             public static DamageAPI.ModdedDamageType BonusForceToPotmobile;
             public static DamageAPI.ModdedDamageType SquashOnKill;
+            public static DamageAPI.ModdedDamageType PotmobileRam;
         }
 
         public static class SkillDefs

@@ -15,6 +15,7 @@ namespace Potmobile
             initialized = true;
             PotmobileContent.ModdedDamageTypes.BonusForceToPotmobile = DamageAPI.ReserveDamageType();
             PotmobileContent.ModdedDamageTypes.SquashOnKill = DamageAPI.ReserveDamageType();
+            PotmobileContent.ModdedDamageTypes.PotmobileRam = DamageAPI.ReserveDamageType();
 
             On.RoR2.HealthComponent.TakeDamage += HealthComponent_TakeDamage;
         }

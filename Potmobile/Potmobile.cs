@@ -33,6 +33,10 @@ namespace Potmobile
         public static List<StageSpawnInfo> StageListHauler = new List<StageSpawnInfo>();
         public static bool fixJumpPad = true;
 
+        public static bool ramEnabled = true;
+        public static bool ramDisableOnEnemies = true;
+        public static bool ramDisableAgainstPotmobiles = true;
+
         public static int secondaryStocks, utilityStocks, specialStocks;
         public static float secondaryCooldown, utilityCooldown, specialCooldown, primaryRadius;
 
@@ -220,6 +224,12 @@ namespace Potmobile
             goHurtBoxGroup.bullseyeCount = 1;
             goHurtBoxGroup.hurtBoxes = goHurtBoxArray;
             goHurtBoxGroup.mainHurtBox = goHurtBox;
+
+            GameObject ramHitbox = new GameObject();
+            ramHitbox.transform.parent = bodyObject.transform;
+            ramHitbox.transform.localScale = bc.size * 1.5f;
+            ramHitbox.name = "RamHitbox";
+            SetupHitbox(bodyObject, "RamHitbox", new Transform[] { ramHitbox.transform });
             #endregion
 
             #region statemachines
@@ -352,6 +362,12 @@ namespace Potmobile
             goHurtBoxGroup.mainHurtBox = goHurtBox;
             #endregion
 
+            GameObject ramHitbox = new GameObject();
+            ramHitbox.transform.parent = bodyObject.transform;
+            ramHitbox.transform.localScale = bc.size * 1.5f;
+            ramHitbox.name = "RamHitbox";
+            SetupHitbox(bodyObject, "RamHitbox", new Transform[] { ramHitbox.transform });
+
             #region statemachines
             NetworkStateMachine nsm = bodyObject.GetComponent<NetworkStateMachine>();
             if (!nsm)
@@ -447,6 +463,23 @@ namespace Potmobile
         private void ContentManager_collectContentPackProviders(RoR2.ContentManagement.ContentManager.AddContentPackProviderDelegate addContentPackProvider)
         {
             addContentPackProvider(new PotmobileContent());
+        }
+
+        private static void SetupHitbox(GameObject prefab, string hitboxName, params Transform[] hitboxTransforms)
+        {
+            HitBoxGroup hitBoxGroup = prefab.AddComponent<HitBoxGroup>();
+            List<HitBox> hitBoxes = new List<HitBox>();
+
+            foreach (Transform i in hitboxTransforms)
+            {
+                HitBox hitBox = i.gameObject.AddComponent<HitBox>();
+                i.gameObject.layer = LayerIndex.projectile.intVal;
+                hitBoxes.Add(hitBox);
+            }
+
+            hitBoxGroup.hitBoxes = hitBoxes.ToArray();
+
+            hitBoxGroup.groupName = hitboxName;
         }
 
         public class StageSpawnInfo
