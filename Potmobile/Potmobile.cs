@@ -35,7 +35,7 @@ namespace Potmobile
 
         public static bool ramEnabled = true;
         public static bool ramDisableOnEnemies = true;
-        public static bool ramDisableAgainstPotmobiles = true;
+        public static bool ramDisableAgainstPlayerPotmobiles = true;
 
         public static int secondaryStocks, utilityStocks, specialStocks;
         public static float secondaryCooldown, utilityCooldown, specialCooldown, primaryRadius;
@@ -79,6 +79,10 @@ namespace Potmobile
             potSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Potmobile)"), 9999f, new ConfigDescription("Position of Potmobile in the Survivor Select menu.")).Value;
             haulSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Hauler)"), 10000f, new ConfigDescription("Position of Hauler in the Survivor Select menu.")).Value;
             GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), false, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
+
+            ramEnabled = base.Config.Bind<bool>(new ConfigDefinition("Ramming", "Enabled"),true, new ConfigDescription("Ramming enemies deals damage.")).Value;
+            ramDisableOnEnemies = base.Config.Bind<bool>(new ConfigDefinition("Ramming", "Disable on Enemies"), true, new ConfigDescription("Enemy Potmobiles and Haulers dont deal ram damage.")).Value;
+            ramDisableAgainstPlayerPotmobiles = base.Config.Bind<bool>(new ConfigDefinition("Ramming", "Disable against Player Vehicles"), true, new ConfigDescription("Player-controlled Potmobiles and Haulers don't deal ram damage to each other.")).Value;
 
             EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.enableICBMSynergy = base.Config.Bind<bool>(new ConfigDefinition("Stats", "Primary - ICBM Synergy"), true, new ConfigDescription("Primary is affected by ICBM.")).Value;
             EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.damageCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats", "Primary - Damage Coefficient"), 10f, new ConfigDescription("How much damage this attack deals. (changes do not show up in skill description)")).Value;
@@ -156,7 +160,11 @@ namespace Potmobile
 
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileBody", true);
 
-            bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
+            SpeedController sc = bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
+            sc.minOverlapDamageCoefficient = 3f;
+            sc.minOverlapSpeed = 10f;
+            sc.doubleDamageOverlapSpeed = 20f;
+
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
             bodyObject.AddComponent<PotmobileNetworkComponent>();   //Used to squash things

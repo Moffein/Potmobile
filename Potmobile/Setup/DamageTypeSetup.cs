@@ -26,7 +26,7 @@ namespace Potmobile
             {
                 if (damageInfo.HasModdedDamageType(PotmobileContent.ModdedDamageTypes.BonusForceToPotmobile))
                 {
-                    if (self.body.bodyIndex == PotmobileContent.PotmobileBodyIndex)
+                    if (self.body.bodyIndex == PotmobileContent.PotmobileBodyIndex || self.body.bodyIndex == PotmobileContent.HaulerBodyIndex)
                     {
                         damageInfo.force *= 4f;
                     }
@@ -45,6 +45,26 @@ namespace Potmobile
                                 if (ni)
                                 {
                                     pnc.SquashEnemy(ni.netId.Value);
+                                }
+                            }
+                        }
+                    }
+
+                    CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
+                    if (attackerBody)
+                    {
+                        if (damageInfo.HasModdedDamageType(PotmobileContent.ModdedDamageTypes.PotmobileRam))
+                        {
+                            if (Potmobile.ramDisableAgainstPlayerPotmobiles && self.body.isPlayerControlled && attackerBody.isPlayerControlled)
+                            {
+                                bool attackerIsVehicle = attackerBody.bodyIndex == PotmobileContent.PotmobileBodyIndex || attackerBody.bodyIndex == PotmobileContent.HaulerBodyIndex;
+                                bool victimIsVehicle = self.body.bodyIndex == PotmobileContent.PotmobileBodyIndex || self.body.bodyIndex == PotmobileContent.HaulerBodyIndex;
+
+                                if (attackerIsVehicle && victimIsVehicle)
+                                {
+                                    damageInfo.damage = 0f;
+                                    damageInfo.damageType |= DamageType.Silent;
+                                    damageInfo.rejected = true;
                                 }
                             }
                         }

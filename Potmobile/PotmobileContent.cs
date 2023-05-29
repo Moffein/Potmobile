@@ -31,6 +31,7 @@ namespace Potmobile
         public static List<SkillDef> skillDefs = new List<SkillDef>();
         public static List<Type> entityStates = new List<Type>();
         public static List<GameObject> projectilePrefabs = new List<GameObject>();
+        public static List<NetworkSoundEventDef> networkSoundEventDefs = new List<NetworkSoundEventDef>();
 
         public static class ModdedDamageTypes
         {
@@ -76,6 +77,7 @@ namespace Potmobile
             content.entityStateTypes.Add(entityStates.ToArray());
             content.skillFamilies.Add(skillFamilies.ToArray());
             content.projectilePrefabs.Add(projectilePrefabs.ToArray());
+            content.networkSoundEventDefs.Add(networkSoundEventDefs.ToArray());
 
             yield break;
         }

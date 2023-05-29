@@ -9,7 +9,6 @@ namespace Potmobile.Components
     public class SpeedController : MonoBehaviour
     {
         public static bool allowReverse = true;
-        public static NetworkSoundEventDef impactSound;
 
         public float reverseSpeedCoefficient = 0.5f;
         private NetworkIdentity networkIdentity;
@@ -20,6 +19,7 @@ namespace Potmobile.Components
         private ModelLocator modelLocator;
         private float baseSpeed;
 
+        private GameObject hitboxObject;
         private HitBoxGroup hitBoxGroup;
         private OverlapAttack overlapAttack;
         public float speedMult = 1f;
@@ -59,6 +59,7 @@ namespace Potmobile.Components
             if (modelLocator.modelTransform)
             {
                 GameObject ramHitbox = new GameObject();
+                hitboxObject = ramHitbox;
                 HurtBoxGroup hbg = modelLocator.modelTransform.gameObject.GetComponent<HurtBoxGroup>();
                 if (hbg && hbg.mainHurtBox)
                 {
@@ -66,8 +67,9 @@ namespace Potmobile.Components
                     if (bc)
                     {
                         ramHitbox.transform.parent = base.transform;
-                        ramHitbox.transform.localScale = bc.size * 1.5f;
+                        ramHitbox.transform.localScale = bc.size * 1.4f;
                         ramHitbox.transform.localPosition = bc.center;
+                        ramHitbox.transform.localRotation = bc.transform.localRotation;
                         ramHitbox.name = "RamHitbox";
                         Potmobile.SetupHitbox(base.gameObject, "RamHitbox", new Transform[] { ramHitbox.transform });
                     }
@@ -92,7 +94,7 @@ namespace Potmobile.Components
             overlapAttack.hitBoxGroup = hitBoxGroup;
             overlapAttack.isCrit = body ? body.RollCrit(): false;
             overlapAttack.AddModdedDamageType(PotmobileContent.ModdedDamageTypes.SquashOnKill);
-            if (impactSound) overlapAttack.impactSound = impactSound.index;
+            overlapAttack.AddModdedDamageType(PotmobileContent.ModdedDamageTypes.PotmobileRam);
         }
 
         //Apply upwards force on spawn to reduce chances of falling through the floor
@@ -109,7 +111,6 @@ namespace Potmobile.Components
 
         public void FixedUpdate()
         {
-
             if (motor)
             {
                 bool reverse = false;
@@ -155,7 +156,9 @@ namespace Potmobile.Components
 
         public void ProcessOverlapAttack()
         {
-            if (!hitBoxGroup) return;
+            bool hitEnemy = false;
+            bool isPlayer = body && (body.isPlayerControlled || (body.teamComponent && body.teamComponent.teamIndex == TeamIndex.Player));
+            if (!Potmobile.ramEnabled || !hitBoxGroup || (!isPlayer && Potmobile.ramDisableOnEnemies)) return;
             overlapResetStopwatch += Time.fixedDeltaTime;
             if (overlapResetStopwatch >= overlapResetInterval)
             {
@@ -169,7 +172,6 @@ namespace Potmobile.Components
             {
                 currentSpeed = rigidbody.velocity.magnitude;
             }
-            Debug.Log(currentSpeed);
 
             if (currentSpeed >= minOverlapSpeed)
             {
@@ -180,7 +182,11 @@ namespace Potmobile.Components
 
                 overlapAttack.damage = damageCoefficient * minOverlapDamageCoefficient * (body ? body.damage : 1f);
 
-                overlapAttack.Fire();
+                hitEnemy = overlapAttack.Fire();
+            }
+            if (hitEnemy)
+            {
+                Util.PlaySound("Play_MULT_shift_hit", base.gameObject);
             }
         }
 
@@ -188,6 +194,15 @@ namespace Potmobile.Components
         public bool HasEffectiveAuthority()
         {
             return networkIdentity && (networkIdentity.hasAuthority || (NetworkServer.active && networkIdentity.clientAuthorityOwner == null));
+        }
+
+
+        private void OnDestroy()
+        {
+            if (hitboxObject)
+            {
+                Destroy(hitboxObject);
+            }
         }
     }
 }
