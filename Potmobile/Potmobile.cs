@@ -23,7 +23,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api.recalculatestats")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.1")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.2")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class Potmobile : BaseUnityPlugin
     {
@@ -189,9 +189,10 @@ namespace Potmobile
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileBody", true);
 
             SpeedController sc = bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
-            sc.minOverlapDamageCoefficient = 2.5f;
+            sc.minOverlapDamageCoefficient = 3f;
             sc.minOverlapSpeed = 10f;
             sc.doubleDamageOverlapSpeed = 20f;
+            sc.ramHitboxSize = new Vector3(6f, 3f, 6f);
 
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
@@ -342,6 +343,7 @@ namespace Potmobile
             sc.minOverlapSpeed = 10f;
             sc.doubleDamageOverlapSpeed = 20f;
             sc.reverseSpeedCoefficient = 0.8f;
+            sc.ramHitboxSize = new Vector3(7.7f, 4.2f, 14f);
 
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying

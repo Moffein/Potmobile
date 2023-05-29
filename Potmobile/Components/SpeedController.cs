@@ -18,6 +18,7 @@ namespace Potmobile.Components
         private InputBankTest inputBank;
         private ModelLocator modelLocator;
         private float baseSpeed;
+        public Vector3 ramHitboxSize = Vector3.one;
 
         private GameObject hitboxObject;
         private HitBoxGroup hitBoxGroup;
@@ -67,7 +68,7 @@ namespace Potmobile.Components
                     if (bc)
                     {
                         ramHitbox.transform.parent = base.transform;
-                        ramHitbox.transform.localScale = bc.size * 1.4f;
+                        ramHitbox.transform.localScale = ramHitboxSize;
                         ramHitbox.transform.localPosition = bc.center;
                         ramHitbox.transform.localRotation = bc.transform.localRotation;
                         ramHitbox.name = "RamHitbox";
