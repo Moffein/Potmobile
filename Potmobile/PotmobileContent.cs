@@ -42,8 +42,6 @@ namespace Potmobile
 
         public static class SkillDefs
         {
-            public static SkillDef FireOverheat;
-            public static SkillDef FireOverheatScepter;
             public static SkillDef FirePotCannon;
             public static SkillDef FirePotCannonScepter;
             public static SkillDef Push;

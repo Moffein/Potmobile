@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3903249063
+CRC: 2642591304
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 85f46c84b6fc2d567df4eeb873a90a47
+    Hash: 2d94ca424851ad52f960d63696bbad55
   TypeTreeHash:
     serializedVersion: 2
     Hash: c90fc19e2679e5295d10bd00f33cb4c3
@@ -18,5 +18,4 @@ Assets:
 - Assets/Resources/texIconPrimaryScepter.png
 - Assets/Resources/texIconPotmobile.png
 - Assets/Resources/texIconHauler.png
-- Assets/Resources/texIconPrimaryAltScepter.png
 Dependencies: []
