@@ -1,4 +1,5 @@
-﻿using RoR2;
+﻿using R2API;
+using RoR2;
 using System;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -90,6 +91,7 @@ namespace Potmobile.Components
             overlapAttack.pushAwayForce = 0f;
             overlapAttack.hitBoxGroup = hitBoxGroup;
             overlapAttack.isCrit = body ? body.RollCrit(): false;
+            overlapAttack.AddModdedDamageType(PotmobileContent.ModdedDamageTypes.SquashOnKill);
             if (impactSound) overlapAttack.impactSound = impactSound.index;
         }
 
@@ -167,7 +169,7 @@ namespace Potmobile.Components
             {
                 currentSpeed = rigidbody.velocity.magnitude;
             }
-            //Debug.Log(currentSpeed);
+            Debug.Log(currentSpeed);
 
             if (currentSpeed >= minOverlapSpeed)
             {

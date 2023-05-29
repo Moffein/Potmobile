@@ -291,7 +291,11 @@ namespace Potmobile
             if (PotmobileContent.HaulerBodyObject) return;
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerBody", true);
 
-            bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
+            SpeedController sc = bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
+            sc.minOverlapDamageCoefficient = 4.5f;
+            sc.minOverlapSpeed = 10f;
+            sc.doubleDamageOverlapSpeed = 20f;
+
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
             bodyObject.AddComponent<PotmobileNetworkComponent>();   //Used to squash things
@@ -435,7 +439,7 @@ namespace Potmobile
         {
             SkillLocator skillLocator = PotmobileContent.HaulerBodyObject.GetComponent<SkillLocator>();
             SkillSetup.CreateSkillFamilies(PotmobileContent.HaulerBodyObject, true);
-            SkillSetup.AddSkillToFamily(skillLocator.primary.skillFamily, PotmobileContent.SkillDefs.FirePotCannon);  //TODO: unique primary
+            SkillSetup.AddSkillToFamily(skillLocator.primary.skillFamily, PotmobileContent.SkillDefs.FirePotCannon);
             SkillSetup.AddSkillToFamily(skillLocator.secondary.skillFamily, PotmobileContent.SkillDefs.Push);
             SkillSetup.AddSkillToFamily(skillLocator.utility.skillFamily, PotmobileContent.SkillDefs.Boost);
             SkillSetup.AddSkillToFamily(skillLocator.special.skillFamily, PotmobileContent.SkillDefs.Reset);
