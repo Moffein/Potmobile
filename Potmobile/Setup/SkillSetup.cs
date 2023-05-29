@@ -96,6 +96,7 @@ namespace Potmobile
 
             PotmobileContent.skillDefs.Add(primaryAltDef);
             PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.FireOverheat));
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.ReloadOverheat));
             AddSkillToFamily(skillLocator.primary.skillFamily, primaryAltDef);
             PotmobileContent.SkillDefs.FireOverheat = primaryAltDef;
         }

@@ -6,22 +6,32 @@ namespace EntityStates.MoffeinPotmobile.Weapon
 {
     public class FireOverheat : BaseState
     {
+        public static int baseShotCount = 6;
         public static float fireFrequency = 6f;
-        public static float baseDPS = 6f;
-        public static float radius = 12f;
+        public static float damageCoefficient = 2f;
+        public static float radius = 14f;
         public static GameObject effectPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/IgniteOnKill/IgniteExplosionVFX.prefab").WaitForCompletion();
 
+        protected int _shotCountInternal;
         protected float _radiusInternal;
-        protected float _DPSInternal;
         protected float _fireFrequencyInternal;
-        private float duration;
+        private float fireDuration;
+        private float fireStopwatch;
+        private int shotsFired;
 
         public override void OnEnter()
         {
             base.OnEnter();
             LoadStats();
-            duration = (1f / _fireFrequencyInternal) / this.attackSpeedStat;
+            fireDuration = (1f / _fireFrequencyInternal) / this.attackSpeedStat;
+            fireStopwatch = 0f;
+            shotsFired = 0;
+            FireAttack();
+        }
 
+        public void FireAttack()
+        {
+            shotsFired++;
             if (effectPrefab) EffectManager.SpawnEffect(effectPrefab, new EffectData { origin = base.transform.position, scale = _radiusInternal }, false);
             if (base.isAuthority)
             {
@@ -32,7 +42,7 @@ namespace EntityStates.MoffeinPotmobile.Weapon
                     crit = base.RollCrit(),
                     position = base.transform.position,
                     radius = _radiusInternal,
-                    baseDamage = this.damageStat * _DPSInternal / _fireFrequencyInternal,
+                    baseDamage = this.damageStat * damageCoefficient,
                     baseForce = 0f,
                     bonusForce = Vector3.zero,
                     attackerFiltering = AttackerFiltering.NeverHitSelf,
@@ -50,18 +60,31 @@ namespace EntityStates.MoffeinPotmobile.Weapon
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-            if (base.fixedAge >= duration)
+
+            if (shotsFired >= _shotCountInternal)
             {
-                this.outer.SetNextStateToMain();
-                return;
+                if (base.isAuthority)
+                {
+                    this.outer.SetNextState(new ReloadOverheat());
+                    return;
+                }
+            }
+            else
+            {
+                fireStopwatch += Time.fixedDeltaTime;
+                if (fireStopwatch >= fireDuration)
+                {
+                    fireStopwatch -= fireDuration;
+                    FireAttack();
+                }
             }
         }
 
         public virtual void LoadStats()
         {
             _radiusInternal = radius;
-            _DPSInternal = baseDPS;
             _fireFrequencyInternal = fireFrequency;
+            _shotCountInternal = baseShotCount;
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()

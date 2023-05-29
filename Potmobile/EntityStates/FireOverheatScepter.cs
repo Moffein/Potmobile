@@ -13,6 +13,7 @@ namespace EntityStates.MoffeinPotmobile.Weapon
             base.LoadStats();
             _radiusInternal *= scepterMult;
             _fireFrequencyInternal *= scepterMult;
+            _shotCountInternal = Mathf.FloorToInt(scepterMult * _shotCountInternal);
         }
     }
 }

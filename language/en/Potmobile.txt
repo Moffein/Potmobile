@@ -12,7 +12,7 @@
 		"MOFFEINPOTMOBILEBODY_PRIMARY_DESCRIPTION" : "Fire an explosive pot for <style=cIsDamage>1000% damage</style>.",
 		
 		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_NAME" : "Overheat",
-		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_DESCRIPTION" : "<style=cIsDamage>Ignite</style> nearby enemies for <style=cIsDamage>600% damage per second</style>.",
+		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_DESCRIPTION" : "<style=cIsDamage>Ignite</style> nearby enemies for <style=cIsDamage>6x200% damage</style>.",
 		
 		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_SCEPTER_NAME" : "Overoverheat",
 		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_SCEPTER_DESCRIPTION" : "<style=cIsDamage>Ignite</style> nearby enemies for <style=cIsDamage>1200% damage per second</style>.",
