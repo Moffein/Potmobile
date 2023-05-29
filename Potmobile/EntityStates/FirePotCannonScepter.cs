@@ -7,7 +7,7 @@ namespace EntityStates.MoffeinPotmobile.Weapon
     public class FirePotCannonScepter : FirePotCannon
     {
         public static GameObject scepterProjectilePrefab;
-        public static float scepterDamageMultiplier = 1.5f;
+        public static float scepterDamageMultiplier = 2f;
 
         public override void ModifyStats()
         {

@@ -204,5 +204,13 @@ namespace Potmobile.Components
                 Destroy(hitboxObject);
             }
         }
+
+        public void Update()
+        {
+            if (HasEffectiveAuthority() && Potmobile.GetKeyPressed(Potmobile.honkButton))
+            {
+
+            }
+        }
     }
 }

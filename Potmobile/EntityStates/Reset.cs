@@ -17,9 +17,6 @@ namespace EntityStates.MoffeinPotmobile.Boost
 
             if (base.isAuthority)
             {
-                //base.transform.Rotate(new Vector3(1f, 0f, 0f), 180f);
-                //Debug.Log("New: " + base.transform.rotation.eulerAngles + "\n");
-
                 if (base.transform)
                 {
                     base.transform.eulerAngles = new Vector3(0f, base.transform.eulerAngles.y, 0f);

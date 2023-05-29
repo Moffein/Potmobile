@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{6EED9384-2220-49AF-8CA8-A55F26194665}" SchemaVersion="97">
+	<AudioObjects>
+		<WorkUnit Name="Default Work Unit" ID="{6EED9384-2220-49AF-8CA8-A55F26194665}" PersistMode="Standalone">
+			<ChildrenList>
+				<ActorMixer Name="Master Mixer" ID="{1A6674B5-93F3-4859-89BB-616AFEAFF25E}" ShortID="433842949">
+					<PropertyList>
+						<Property Name="Volume" Type="Real64">
+							<RTPCList>
+								<RTPC Name="" ID="{FE0A6E1A-6218-4ADF-BC9F-3FC5533BEE57}" ShortID="840761159">
+									<ReferenceList>
+										<Reference Name="ControlInput">
+											<ObjectRef Name="Volume_SFX" ID="{CC0ED1FB-8908-4CDA-BDDA-98BDABDFD5EE}" WorkUnitID="{197DB663-F8F1-472A-9073-66E06AA02C48}"/>
+										</Reference>
+									</ReferenceList>
+									<Curve Name="" ID="{F48E2609-6BC3-4C3E-91A6-47621900067E}">
+										<PropertyList>
+											<Property Name="Flags" Type="int32" Value="3"/>
+										</PropertyList>
+										<PointList>
+											<Point>
+												<XPos>0</XPos>
+												<YPos>-200</YPos>
+												<Flags>5</Flags>
+											</Point>
+											<Point>
+												<XPos>100</XPos>
+												<YPos>0</YPos>
+												<Flags>37</Flags>
+											</Point>
+										</PointList>
+									</Curve>
+								</RTPC>
+							</RTPCList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{C41A5520-D042-495D-89C8-059CB32467CF}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{9972A4F6-F4DD-4D43-AC78-CDF05D2D154D}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<ActorMixer Name="SFX Mixer" ID="{46C7E708-418E-47F7-BD8E-96AF4FAACEBE}" ShortID="103097456">
+							<PropertyList>
+								<Property Name="3DSpatialization" Type="int16" Value="2"/>
+								<Property Name="OverridePositioning" Type="bool" Value="True"/>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Attenuation">
+									<ObjectRef Name="SFX Atten" ID="{1C692CE0-E3A6-4A6F-86A0-C356A4AE122E}" WorkUnitID="{9700E7BA-6F86-40C0-BC94-01EC071A3C9E}"/>
+								</Reference>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{C41A5520-D042-495D-89C8-059CB32467CF}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{9972A4F6-F4DD-4D43-AC78-CDF05D2D154D}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<Sound Name="carhorn" ID="{61AAF679-DA72-4494-9ECE-00C2AEB9CA4F}" ShortID="651434502">
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{C41A5520-D042-495D-89C8-059CB32467CF}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{9972A4F6-F4DD-4D43-AC78-CDF05D2D154D}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="carhorn" ID="{54127A8B-DED8-44C7-AA5E-F79212B8796B}">
+											<Language>SFX</Language>
+											<AudioFile>carhorn.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="777582026"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="carhorn" ID="{54127A8B-DED8-44C7-AA5E-F79212B8796B}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+							</ChildrenList>
+						</ActorMixer>
+					</ChildrenList>
+				</ActorMixer>
+			</ChildrenList>
+		</WorkUnit>
+	</AudioObjects>
+</WwiseDocument>

@@ -6,10 +6,43 @@ namespace Potmobile.Components
 {
     public class PotmobileNetworkComponent : NetworkBehaviour
     {
+        private bool wasPressed;
+        private float honkCooldownStopwatch;
         private CharacterBody characterBody;
         public void Awake()
         {
+            wasPressed = false;
+            honkCooldownStopwatch = 0f;
             characterBody = base.GetComponent<CharacterBody>();
+        }
+
+        public void Update()
+        {
+            if (this.hasAuthority)
+            {
+                if (honkCooldownStopwatch <= 0f)
+                {
+                    if (Potmobile.GetKeyPressed(Potmobile.honkButton))
+                    {
+                        if (!wasPressed)
+                        {
+                            //EffectManager.SimpleSoundEffect(SquawkController.squawk.index, base.transform.position, true);
+                            Util.PlaySound("Play_MoffeinPotmobile_Horn", base.gameObject);
+                            CmdHonk();
+                            honkCooldownStopwatch = 0.15f;
+                        }
+                        wasPressed = true;
+                    }
+                    else
+                    {
+                        wasPressed = false;
+                    }
+                }
+                else
+                {
+                    honkCooldownStopwatch -= Time.deltaTime;
+                }
+            }
         }
 
         [Server]
@@ -45,6 +78,21 @@ namespace Potmobile.Components
                         sq.triggerer = base.gameObject;
                     }
                 }
+            }
+        }
+
+        [Command]
+        public void CmdHonk()
+        {
+            RpcHonk();
+        }
+
+        [ClientRpc]
+        private void RpcHonk()
+        {
+            if (!this.hasAuthority)
+            {
+                Util.PlaySound("Play_MoffeinPotmobile_Horn", base.gameObject);
             }
         }
     }

@@ -103,7 +103,7 @@ namespace Potmobile
 
             GameObject projectilePrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherProjectile.prefab").WaitForCompletion().InstantiateClone("MoffeinPotmobileRocketScepter", true);
             ProjectileImpactExplosion pie = projectilePrefab.GetComponent<ProjectileImpactExplosion>();
-            pie.blastRadius = Potmobile.primaryRadius * 1.5f;
+            pie.blastRadius = Potmobile.primaryRadius * 2f;
             pie.falloffModel = BlastAttack.FalloffModel.None;
             pie.bonusBlastForce = Vector3.zero;
 
@@ -114,9 +114,10 @@ namespace Potmobile
             pd.damageType = DamageType.ClayGoo;
 
             PotmobileContent.projectilePrefabs.Add(projectilePrefab);
-            EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter.projectilePrefab = projectilePrefab;
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter.scepterProjectilePrefab = projectilePrefab;
 
             if (Potmobile.scepterPluginLoaded) AssignScepter();
+            if (Potmobile.classicItemsLoaded) AssignScepterClassic();
         }
 
 
@@ -125,6 +126,13 @@ namespace Potmobile
         {
             AncientScepter.AncientScepterItem.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinPotmobileBody", SkillSlot.Primary, 0);
             AncientScepter.AncientScepterItem.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinHaulerBody", SkillSlot.Primary, 0);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        private static void AssignScepterClassic()
+        {
+            ThinkInvisible.ClassicItems.Scepter.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinPotmobileBody", SkillSlot.Secondary, PotmobileContent.SkillDefs.FirePotCannon);
+            ThinkInvisible.ClassicItems.Scepter.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinHaulerBody", SkillSlot.Secondary, PotmobileContent.SkillDefs.FirePotCannon);
         }
 
 

@@ -4,9 +4,11 @@ using EntityStates;
 using Potmobile.Components;
 using R2API;
 using R2API.Utils;
+using RiskOfOptions;
 using RoR2;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -14,16 +16,21 @@ namespace Potmobile
 {
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.bepis.r2api.prefab")]
+    [BepInDependency("com.bepis.r2api.sound")]
     [BepInDependency("com.bepis.r2api.director")]
     [BepInDependency("com.bepis.r2api.damagetype")]
     [BepInDependency("com.bepis.r2api.loadout")]
     [BepInDependency("com.bepis.r2api.recalculatestats")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class Potmobile : BaseUnityPlugin
     {
+        public static bool classicItemsLoaded = false;
         public static bool scepterPluginLoaded = false;
+        public static bool riskOfOptionsLoaded = false;
+
         public static PluginInfo pluginInfo;
         public static float potSortPosition = 9999f;
         public static float haulSortPosition = 10000f;
@@ -33,6 +40,8 @@ namespace Potmobile
         public static List<StageSpawnInfo> StageListHauler = new List<StageSpawnInfo>();
         public static bool fixJumpPad = true;
 
+        public static float potmobileImpactMult, haulerImpactMult;
+
         public static bool ramEnabled = true;
         public static bool ramDisableOnEnemies = true;
         public static bool ramDisableAgainstPlayerPotmobiles = true;
@@ -40,9 +49,13 @@ namespace Potmobile
         public static int secondaryStocks, utilityStocks, specialStocks;
         public static float secondaryCooldown, utilityCooldown, specialCooldown, primaryRadius;
 
+        public static ConfigEntry<KeyboardShortcut> honkButton;
+
         public void Awake()
         {
             scepterPluginLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.DestroyedClone.AncientScepter");
+            riskOfOptionsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.rune580.riskofoptions");
+            classicItemsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.ThinkInvisible.ClassicItems");
 
             pluginInfo = Info;
             Assets.Init();
@@ -75,6 +88,9 @@ namespace Potmobile
         {
             fixJumpPad = base.Config.Bind<bool>(new ConfigDefinition("General", "Fix Jump Pads"), true, new ConfigDescription("Fixes Potmobiles ignoring jump pads.")).Value;
             SpeedController.allowReverse = base.Config.Bind<bool>(new ConfigDefinition("General", "Allow Reverse"), true, new ConfigDescription("Allow Potmobiles to reverse.")).Value;
+            honkButton = base.Config.Bind<KeyboardShortcut>(new ConfigDefinition("General", "Honk Button"), KeyboardShortcut.Empty, new ConfigDescription("Button to honk."));
+            potmobileImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Potmobile)"), 1f, new ConfigDescription("Affects knockback force when ramming things.")).Value;
+            haulerImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Hauler)"), 1f, new ConfigDescription("Affects knockback force when ramming things.")).Value;
 
             potSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Potmobile)"), 9999f, new ConfigDescription("Position of Potmobile in the Survivor Select menu.")).Value;
             haulSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Hauler)"), 10000f, new ConfigDescription("Position of Hauler in the Survivor Select menu.")).Value;
@@ -145,6 +161,18 @@ namespace Potmobile
 
                 StageListHauler.Add(new StageSpawnInfo(name, minStages));
             }
+
+            if (riskOfOptionsLoaded)
+            {
+                RiskOfOptionsCompat();
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        private void RiskOfOptionsCompat()
+        {
+            ModSettingsManager.SetModIcon(Assets.assetBundle.LoadAsset<Sprite>("texIconPotmobile.png"));
+            ModSettingsManager.AddOption(new RiskOfOptions.Options.KeyBindOption(honkButton));
         }
 
         private void LateSetup()
@@ -161,7 +189,7 @@ namespace Potmobile
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileBody", true);
 
             SpeedController sc = bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
-            sc.minOverlapDamageCoefficient = 3f;
+            sc.minOverlapDamageCoefficient = 2.5f;
             sc.minOverlapSpeed = 10f;
             sc.doubleDamageOverlapSpeed = 20f;
 
@@ -272,6 +300,16 @@ namespace Potmobile
             cdb.deathState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.PotmobileDeath));
             cdb.deathStateMachine = ssoh.targetStateMachine;
             cdb.idleStateMachine = ssoh.idleStateMachine;
+
+            VehicleForceZone vfz = bodyObject.GetComponentInChildren<VehicleForceZone>();
+            if (potmobileImpactMult <= 0f)
+            {
+                Destroy(vfz);
+            }
+            else
+            {
+                vfz.impactMultiplier = potmobileImpactMult;
+            }
 
             PotmobileContent.PotmobileBodyObject = bodyObject;
         }
@@ -421,6 +459,16 @@ namespace Potmobile
             cdb.deathStateMachine = ssoh.targetStateMachine;
             cdb.idleStateMachine = ssoh.idleStateMachine;
 
+            VehicleForceZone vfz = bodyObject.GetComponentInChildren<VehicleForceZone>();
+            if (haulerImpactMult <= 0f)
+            {
+                Destroy(vfz);
+            }
+            else
+            {
+                vfz.impactMultiplier = haulerImpactMult;
+            }
+
             PotmobileContent.HaulerBodyObject = bodyObject;
         }
 
@@ -498,6 +546,19 @@ namespace Potmobile
             hitBoxGroup.hitBoxes = hitBoxes.ToArray();
 
             hitBoxGroup.groupName = hitboxName;
+        }
+
+        //Taken from https://github.com/ToastedOven/CustomEmotesAPI/blob/main/CustomEmotesAPI/CustomEmotesAPI/CustomEmotesAPI.cs
+        public static bool GetKeyPressed(ConfigEntry<KeyboardShortcut> entry)
+        {
+            foreach (var item in entry.Value.Modifiers)
+            {
+                if (!Input.GetKey(item))
+                {
+                    return false;
+                }
+            }
+            return Input.GetKeyDown(entry.Value.MainKey);
         }
 
         public class StageSpawnInfo

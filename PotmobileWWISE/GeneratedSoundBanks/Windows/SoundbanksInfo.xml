@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SoundBanksInfo Platform="Windows" BasePlatform="Windows" SchemaVersion="12" SoundbankVersion="135">
+	<RootPaths>
+		<ProjectRoot>C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\</ProjectRoot>
+		<SourceFilesRoot>C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\.cache\Windows\</SourceFilesRoot>
+		<SoundBanksRoot>C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\GeneratedSoundBanks\Windows\</SoundBanksRoot>
+		<ExternalSourcesInputFile></ExternalSourcesInputFile>
+		<ExternalSourcesOutputRoot>C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\GeneratedSoundBanks\Windows</ExternalSourcesOutputRoot>
+	</RootPaths>
+	<DialogueEvents/>
+	<StreamedFiles/>
+	<MediaFilesNotInAnyBank/>
+	<SoundBanks>
+		<SoundBank Id="1355168291" Language="SFX" Hash="263542888">
+			<ObjectPath>Init</ObjectPath>
+			<ShortName>Init</ShortName>
+			<Path>Init.bnk</Path>
+		</SoundBank>
+		<SoundBank Id="1508999413" Language="SFX" Hash="2655303812">
+			<ObjectPath>\SoundBanks\Default Work Unit\MoffeinPotmobileSoundbank</ObjectPath>
+			<ShortName>MoffeinPotmobileSoundbank</ShortName>
+			<Path>MoffeinPotmobileSoundbank.bnk</Path>
+			<IncludedEvents>
+				<Event Id="310789011" Name="Play_MoffeinPotmobile_Horn" ObjectPath="\Events\Default Work Unit\Play_MoffeinPotmobile_Horn">
+					<IncludedMemoryFiles>
+						<File Id="777582026" Language="SFX">
+							<ShortName>carhorn.wav</ShortName>
+							<Path>SFX\carhorn_10C4C929.wem</Path>
+						</File>
+					</IncludedMemoryFiles>
+				</Event>
+			</IncludedEvents>
+			<GameParameters>
+				<GameParameter Id="3673881719" Name="Volume_SFX" ObjectPath="\Game Parameters\Default Work Unit\Volume_SFX"/>
+			</GameParameters>
+		</SoundBank>
+	</SoundBanks>
+</SoundBanksInfo>
