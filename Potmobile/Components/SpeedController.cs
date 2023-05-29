@@ -1,4 +1,5 @@
 ﻿using RoR2;
+using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -7,6 +8,7 @@ namespace Potmobile.Components
     public class SpeedController : MonoBehaviour
     {
         public static bool allowReverse = true;
+        public static NetworkSoundEventDef impactSound;
 
         public float reverseSpeedCoefficient = 0.5f;
         private NetworkIdentity networkIdentity;
@@ -14,9 +16,20 @@ namespace Potmobile.Components
         public CharacterBody body;
         public HoverVehicleMotor motor;
         private InputBankTest inputBank;
+        private ModelLocator modelLocator;
         private float baseSpeed;
 
+        private HitBoxGroup hitBoxGroup;
+        private OverlapAttack overlapAttack;
         public float speedMult = 1f;
+
+        public float minOverlapDamageCoefficient = 3f;
+        public float minOverlapSpeed = 20f;
+        public float doubleDamageOverlapSpeed = 40f;
+
+        public Vector3 overlapForce = 2500f * Vector3.down;
+        public float overlapResetInterval = 1f;
+        private float overlapResetStopwatch;
 
         public void Awake()
         {
@@ -25,11 +38,59 @@ namespace Potmobile.Components
             body = base.GetComponent<CharacterBody>();
             rigidbody = base.GetComponent<Rigidbody>();
             inputBank = base.GetComponent<InputBankTest>();
+            modelLocator = base.GetComponent<ModelLocator>();
 
             if (motor)
             {
                 baseSpeed = motor.motorForce;
             }
+
+            if (modelLocator)
+            {
+                BuildHitbox();
+                InitOverlapAttack();
+            }
+        }
+
+        //SUPER CURSED, should do this in Unity if possible (not an option here)
+        private void BuildHitbox()
+        {
+            if (modelLocator.modelTransform)
+            {
+                GameObject ramHitbox = new GameObject();
+                HurtBoxGroup hbg = modelLocator.modelTransform.gameObject.GetComponent<HurtBoxGroup>();
+                if (hbg && hbg.mainHurtBox)
+                {
+                    BoxCollider bc = hbg.mainHurtBox.GetComponent<BoxCollider>();
+                    if (bc)
+                    {
+                        ramHitbox.transform.parent = base.transform;
+                        ramHitbox.transform.localScale = bc.size * 1.5f;
+                        ramHitbox.transform.localPosition = bc.center;
+                        ramHitbox.name = "RamHitbox";
+                        Potmobile.SetupHitbox(base.gameObject, "RamHitbox", new Transform[] { ramHitbox.transform });
+                    }
+                }
+                hitBoxGroup = base.GetComponent<HitBoxGroup>();
+            }
+        }
+
+        private void InitOverlapAttack()
+        {
+            if (!hitBoxGroup) return;
+            overlapResetStopwatch = 0f;
+
+            overlapAttack = new OverlapAttack();
+            overlapAttack.damageType = DamageType.Generic;
+            overlapAttack.attacker = base.gameObject;
+            overlapAttack.inflictor = base.gameObject;
+            overlapAttack.teamIndex = (body && body.teamComponent) ? body.teamComponent.teamIndex : TeamIndex.None;
+            overlapAttack.damage = 0f;
+            overlapAttack.forceVector = overlapForce;
+            overlapAttack.pushAwayForce = 0f;
+            overlapAttack.hitBoxGroup = hitBoxGroup;
+            overlapAttack.isCrit = body ? body.RollCrit(): false;
+            if (impactSound) overlapAttack.impactSound = impactSound.index;
         }
 
         //Apply upwards force on spawn to reduce chances of falling through the floor
@@ -46,6 +107,7 @@ namespace Potmobile.Components
 
         public void FixedUpdate()
         {
+
             if (motor)
             {
                 bool reverse = false;
@@ -77,6 +139,46 @@ namespace Potmobile.Components
                     calcSpeed *= reverseSpeedCoefficient * -1f;
                 }
                 motor.motorForce = calcSpeed;
+            }
+
+            if (HasEffectiveAuthority())
+            {
+                if (body)
+                {
+                    body.isSprinting = speedMult > 1f;
+                }
+                ProcessOverlapAttack();
+            }
+        }
+
+        public void ProcessOverlapAttack()
+        {
+            if (!hitBoxGroup) return;
+            overlapResetStopwatch += Time.fixedDeltaTime;
+            if (overlapResetStopwatch >= overlapResetInterval)
+            {
+                overlapResetStopwatch -= overlapResetInterval;
+                overlapAttack.ResetIgnoredHealthComponents();
+                overlapAttack.isCrit = body ? body.RollCrit() : false;
+            }
+
+            float currentSpeed = 0f;
+            if (rigidbody)
+            {
+                currentSpeed = rigidbody.velocity.magnitude;
+            }
+            //Debug.Log(currentSpeed);
+
+            if (currentSpeed >= minOverlapSpeed)
+            {
+                //InverseLerp is clamped, so calc manually
+                float invLerp = (currentSpeed - minOverlapSpeed) / (doubleDamageOverlapSpeed - minOverlapSpeed);
+
+                float damageCoefficient = 1f + invLerp;
+
+                overlapAttack.damage = damageCoefficient * minOverlapDamageCoefficient * (body ? body.damage : 1f);
+
+                overlapAttack.Fire();
             }
         }
 

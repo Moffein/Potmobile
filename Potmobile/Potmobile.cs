@@ -189,6 +189,7 @@ namespace Potmobile
             cb.levelRegen = 0.2f;
             cb.baseDamage = 12f;
             cb.levelDamage = 2.4f;
+            cb.sprintingSpeedMultiplier = 1f;
 
             #region hurtbox
             HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();
@@ -225,11 +226,13 @@ namespace Potmobile
             goHurtBoxGroup.hurtBoxes = goHurtBoxArray;
             goHurtBoxGroup.mainHurtBox = goHurtBox;
 
-            GameObject ramHitbox = new GameObject();
+            //Doesn't work, build hitbox at runtime instead.
+            //Would be simpler if this was done on the prefab in Unity, but that's not an option here.
+            /*GameObject ramHitbox = new GameObject();
             ramHitbox.transform.parent = bodyObject.transform;
             ramHitbox.transform.localScale = bc.size * 1.5f;
             ramHitbox.name = "RamHitbox";
-            SetupHitbox(bodyObject, "RamHitbox", new Transform[] { ramHitbox.transform });
+            SetupHitbox(bodyObject, "RamHitbox", new Transform[] { ramHitbox.transform });*/
             #endregion
 
             #region statemachines
@@ -325,6 +328,7 @@ namespace Potmobile
             cb.levelRegen = 0.2f;
             cb.baseDamage = 12f;
             cb.levelDamage = 2.4f;
+            cb.sprintingSpeedMultiplier = 1f;
 
             #region hurtbox
             HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();
@@ -362,11 +366,13 @@ namespace Potmobile
             goHurtBoxGroup.mainHurtBox = goHurtBox;
             #endregion
 
-            GameObject ramHitbox = new GameObject();
+            //Doesn't work, build hitbox at runtime instead.
+            //Would be simpler if this was done on the prefab in Unity, but that's not an option here.
+            /*GameObject ramHitbox = new GameObject();
             ramHitbox.transform.parent = bodyObject.transform;
             ramHitbox.transform.localScale = bc.size * 1.5f;
             ramHitbox.name = "RamHitbox";
-            SetupHitbox(bodyObject, "RamHitbox", new Transform[] { ramHitbox.transform });
+            SetupHitbox(bodyObject, "RamHitbox", new Transform[] { ramHitbox.transform });*/
 
             #region statemachines
             NetworkStateMachine nsm = bodyObject.GetComponent<NetworkStateMachine>();
@@ -465,7 +471,7 @@ namespace Potmobile
             addContentPackProvider(new PotmobileContent());
         }
 
-        private static void SetupHitbox(GameObject prefab, string hitboxName, params Transform[] hitboxTransforms)
+        public static void SetupHitbox(GameObject prefab, string hitboxName, params Transform[] hitboxTransforms)
         {
             HitBoxGroup hitBoxGroup = prefab.AddComponent<HitBoxGroup>();
             List<HitBox> hitBoxes = new List<HitBox>();
