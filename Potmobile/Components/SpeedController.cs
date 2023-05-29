@@ -19,6 +19,7 @@ namespace Potmobile.Components
         private ModelLocator modelLocator;
         private float baseSpeed;
         public Vector3 ramHitboxSize = Vector3.one;
+        private TeamComponent tc;
 
         private GameObject hitboxObject;
         private HitBoxGroup hitBoxGroup;
@@ -41,6 +42,7 @@ namespace Potmobile.Components
             rigidbody = base.GetComponent<Rigidbody>();
             inputBank = base.GetComponent<InputBankTest>();
             modelLocator = base.GetComponent<ModelLocator>();
+            tc = base.GetComponent<TeamComponent>();
 
             if (motor)
             {
@@ -88,7 +90,7 @@ namespace Potmobile.Components
             overlapAttack.damageType = DamageType.Generic;
             overlapAttack.attacker = base.gameObject;
             overlapAttack.inflictor = base.gameObject;
-            overlapAttack.teamIndex = (body && body.teamComponent) ? body.teamComponent.teamIndex : TeamIndex.None;
+            overlapAttack.teamIndex = tc ? tc.teamIndex : TeamIndex.None;
             overlapAttack.damage = 0f;
             overlapAttack.forceVector = overlapForce;
             overlapAttack.pushAwayForce = 0f;
@@ -160,6 +162,10 @@ namespace Potmobile.Components
             bool hitEnemy = false;
             bool isPlayer = body && (body.isPlayerControlled || (body.teamComponent && body.teamComponent.teamIndex == TeamIndex.Player));
             if (!Potmobile.ramEnabled || !hitBoxGroup || (!isPlayer && Potmobile.ramDisableOnEnemies)) return;
+
+            if (!tc) tc = base.GetComponent<TeamComponent>();
+            overlapAttack.teamIndex = tc ? tc.teamIndex : TeamIndex.None;
+
             overlapResetStopwatch += Time.fixedDeltaTime;
             if (overlapResetStopwatch >= overlapResetInterval)
             {
