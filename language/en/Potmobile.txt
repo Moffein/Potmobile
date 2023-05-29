@@ -11,6 +11,12 @@
 		"MOFFEINPOTMOBILEBODY_PRIMARY_NAME" : "Pot Shot",
 		"MOFFEINPOTMOBILEBODY_PRIMARY_DESCRIPTION" : "Fire an explosive pot for <style=cIsDamage>1000% damage</style>.",
 		
+		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_NAME" : "Overheat",
+		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_DESCRIPTION" : "<style=cIsDamage>Ignite</style> nearby enemies for <style=cIsDamage>600% damage per second</style>.",
+		
+		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_SCEPTER_NAME" : "Overoverheat",
+		"MOFFEINPOTMOBILEBODY_PRIMARY_ALT_SCEPTER_DESCRIPTION" : "<style=cIsDamage>Ignite</style> nearby enemies for <style=cIsDamage>1200% damage per second</style>.",
+		
 		"MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_NAME" : "Giga Pot Shot",
 		"MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_DESCRIPTION" : "Fire an explosive pot for <style=cIsDamage>2000% damage</style>.",
 		

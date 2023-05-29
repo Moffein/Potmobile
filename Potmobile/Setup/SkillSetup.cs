@@ -72,6 +72,32 @@ namespace Potmobile
 
             PotmobileContent.projectilePrefabs.Add(projectilePrefab);
             EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.projectilePrefab = projectilePrefab;
+
+            SkillDef primaryAltDef = SkillDef.CreateInstance<SkillDef>();
+            primaryAltDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Weapon.FireOverheat));
+            primaryAltDef.baseRechargeInterval = 0f;
+            primaryAltDef.skillNameToken = "MOFFEINPOTMOBILEBODY_PRIMARY_ALT_NAME";
+            primaryAltDef.skillDescriptionToken = "MOFFEINPOTMOBILEBODY_PRIMARY_ALT_DESCRIPTION";
+            primaryAltDef.skillName = "FireOverheat";
+            primaryAltDef.icon = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Mage/MageBodyFlamethrower.asset").WaitForCompletion().icon;
+            primaryAltDef.baseMaxStock = 1;
+            primaryAltDef.rechargeStock = 1;
+            primaryAltDef.beginSkillCooldownOnSkillEnd = false;
+            primaryAltDef.activationStateMachineName = "Weapon";
+            primaryAltDef.interruptPriority = InterruptPriority.Any;
+            primaryAltDef.isCombatSkill = true;
+            primaryAltDef.cancelSprintingOnActivation = false;
+            primaryAltDef.canceledFromSprinting = false;
+            primaryAltDef.mustKeyPress = false;
+            primaryAltDef.requiredStock = 1;
+            primaryAltDef.stockToConsume = 1;
+            primaryAltDef.keywordTokens = new string[] { };
+            (primaryAltDef as ScriptableObject).name = primaryAltDef.skillName;
+
+            PotmobileContent.skillDefs.Add(primaryAltDef);
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.FireOverheat));
+            AddSkillToFamily(skillLocator.primary.skillFamily, primaryAltDef);
+            PotmobileContent.SkillDefs.FireOverheat = primaryAltDef;
         }
 
         private static void BuildPrimaryScepter()
@@ -116,6 +142,31 @@ namespace Potmobile
             PotmobileContent.projectilePrefabs.Add(projectilePrefab);
             EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter.scepterProjectilePrefab = projectilePrefab;
 
+            SkillDef primaryScepterAltDef = SkillDef.CreateInstance<SkillDef>();
+            primaryScepterAltDef.activationState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.Weapon.FireOverheatScepter));
+            primaryScepterAltDef.baseRechargeInterval = 0f;
+            primaryScepterAltDef.skillNameToken = "MOFFEINPOTMOBILEBODY_PRIMARY_ALT_SCEPTER_NAME";
+            primaryScepterAltDef.skillDescriptionToken = "MOFFEINPOTMOBILEBODY_PRIMARY_ALT_SCEPTER_DESCRIPTION";
+            primaryScepterAltDef.skillName = "FireOverheatScepter";
+            primaryScepterAltDef.icon = Assets.assetBundle.LoadAsset<Sprite>("texIconPrimaryAltScepter.png");
+            primaryScepterAltDef.baseMaxStock = 1;
+            primaryScepterAltDef.rechargeStock = 1;
+            primaryScepterAltDef.beginSkillCooldownOnSkillEnd = false;
+            primaryScepterAltDef.activationStateMachineName = "Weapon";
+            primaryScepterAltDef.interruptPriority = InterruptPriority.Any;
+            primaryScepterAltDef.isCombatSkill = true;
+            primaryScepterAltDef.cancelSprintingOnActivation = false;
+            primaryScepterAltDef.canceledFromSprinting = false;
+            primaryScepterAltDef.mustKeyPress = false;
+            primaryScepterAltDef.requiredStock = 1;
+            primaryScepterAltDef.stockToConsume = 1;
+            primaryScepterAltDef.keywordTokens = new string[] { };
+            (primaryScepterAltDef as ScriptableObject).name = primaryScepterAltDef.skillName;
+
+            PotmobileContent.skillDefs.Add(primaryScepterAltDef);
+            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.FireOverheatScepter));
+            PotmobileContent.SkillDefs.FireOverheatScepter = primaryScepterAltDef;
+
             if (Potmobile.scepterPluginLoaded) AssignScepter();
             if (Potmobile.classicItemsLoaded) AssignScepterClassic();
         }
@@ -126,13 +177,19 @@ namespace Potmobile
         {
             AncientScepter.AncientScepterItem.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinPotmobileBody", SkillSlot.Primary, 0);
             AncientScepter.AncientScepterItem.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinHaulerBody", SkillSlot.Primary, 0);
+
+            AncientScepter.AncientScepterItem.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FireOverheatScepter, "MoffeinPotmobileBody", SkillSlot.Primary, 1);
+            AncientScepter.AncientScepterItem.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FireOverheatScepter, "MoffeinHaulerBody", SkillSlot.Primary, 1);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         private static void AssignScepterClassic()
         {
-            ThinkInvisible.ClassicItems.Scepter.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinPotmobileBody", SkillSlot.Secondary, PotmobileContent.SkillDefs.FirePotCannon);
-            ThinkInvisible.ClassicItems.Scepter.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinHaulerBody", SkillSlot.Secondary, PotmobileContent.SkillDefs.FirePotCannon);
+            ThinkInvisible.ClassicItems.Scepter.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinPotmobileBody", SkillSlot.Primary, PotmobileContent.SkillDefs.FirePotCannon);
+            ThinkInvisible.ClassicItems.Scepter.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FirePotCannonScepter, "MoffeinHaulerBody", SkillSlot.Primary, PotmobileContent.SkillDefs.FirePotCannon);
+
+            ThinkInvisible.ClassicItems.Scepter.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FireOverheatScepter, "MoffeinPotmobileBody", SkillSlot.Primary, PotmobileContent.SkillDefs.FireOverheat);
+            ThinkInvisible.ClassicItems.Scepter.instance.RegisterScepterSkill(PotmobileContent.SkillDefs.FireOverheatScepter, "MoffeinHaulerBody", SkillSlot.Primary, PotmobileContent.SkillDefs.FireOverheat);
         }
 
 

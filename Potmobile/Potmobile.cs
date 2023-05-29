@@ -23,7 +23,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api.recalculatestats")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.0")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class Potmobile : BaseUnityPlugin
     {
@@ -341,6 +341,7 @@ namespace Potmobile
             sc.minOverlapDamageCoefficient = 4.5f;
             sc.minOverlapSpeed = 10f;
             sc.doubleDamageOverlapSpeed = 20f;
+            sc.reverseSpeedCoefficient = 0.8f;
 
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
@@ -496,6 +497,7 @@ namespace Potmobile
             SkillLocator skillLocator = PotmobileContent.HaulerBodyObject.GetComponent<SkillLocator>();
             SkillSetup.CreateSkillFamilies(PotmobileContent.HaulerBodyObject, true);
             SkillSetup.AddSkillToFamily(skillLocator.primary.skillFamily, PotmobileContent.SkillDefs.FirePotCannon);
+            SkillSetup.AddSkillToFamily(skillLocator.primary.skillFamily, PotmobileContent.SkillDefs.FireOverheat);
             SkillSetup.AddSkillToFamily(skillLocator.secondary.skillFamily, PotmobileContent.SkillDefs.Push);
             SkillSetup.AddSkillToFamily(skillLocator.utility.skillFamily, PotmobileContent.SkillDefs.Boost);
             SkillSetup.AddSkillToFamily(skillLocator.special.skillFamily, PotmobileContent.SkillDefs.Reset);
