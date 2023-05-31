@@ -15,16 +15,11 @@ using UnityEngine.AddressableAssets;
 namespace Potmobile
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInDependency("com.bepis.r2api.prefab")]
-    [BepInDependency("com.bepis.r2api.sound")]
-    [BepInDependency("com.bepis.r2api.director")]
-    [BepInDependency("com.bepis.r2api.damagetype")]
-    [BepInDependency("com.bepis.r2api.loadout")]
-    [BepInDependency("com.bepis.r2api.recalculatestats")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.3")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.4")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
+    [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
     public class Potmobile : BaseUnityPlugin
     {
         public static bool classicItemsLoaded = false;
@@ -213,6 +208,7 @@ namespace Potmobile
             cb.name = "MoffeinPotmobileBody";
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
+            cb.bodyFlags |= CharacterBody.BodyFlags.ImmuneToExecutes;
             cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
             cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texIconPotmobile.png");
 
@@ -368,6 +364,7 @@ namespace Potmobile
             cb.name = "MoffeinHaulerBody";
             cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
             cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
+            cb.bodyFlags |= CharacterBody.BodyFlags.ImmuneToExecutes;
             cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
             cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texIconHauler.png");
 
