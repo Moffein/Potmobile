@@ -17,7 +17,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.4")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.6")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
     public class Potmobile : BaseUnityPlugin
@@ -34,6 +34,8 @@ namespace Potmobile
         public static List<StageSpawnInfo> StageListPotmobile = new List<StageSpawnInfo>();
         public static List<StageSpawnInfo> StageListHauler = new List<StageSpawnInfo>();
         public static bool fixJumpPad = true;
+        public static bool impactFriendlyFireEnabled = false;
+        public static bool impactFriendlyFirePotmobileEnabled = true;
 
         public static float potmobileImpactMult, haulerImpactMult;
 
@@ -75,6 +77,8 @@ namespace Potmobile
             FixJumpPad();
             EnemySetup.Init();
 
+            FixVehicleForceZoneFriendlyFire();
+
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
         }
@@ -84,8 +88,10 @@ namespace Potmobile
             fixJumpPad = base.Config.Bind<bool>(new ConfigDefinition("General", "Fix Jump Pads"), true, new ConfigDescription("Fixes Potmobiles ignoring jump pads.")).Value;
             SpeedController.allowReverse = base.Config.Bind<bool>(new ConfigDefinition("General", "Allow Reverse"), true, new ConfigDescription("Allow Potmobiles to reverse.")).Value;
             honkButton = base.Config.Bind<KeyboardShortcut>(new ConfigDefinition("General", "Honk Button"), KeyboardShortcut.Empty, new ConfigDescription("Button to honk."));
-            potmobileImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Potmobile)"), 1f, new ConfigDescription("Affects knockback force when ramming things.")).Value;
-            haulerImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Hauler)"), 1f, new ConfigDescription("Affects knockback force when ramming things.")).Value;
+            potmobileImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Potmobile)"), 1f, new ConfigDescription("Affects knockback force when colliding with things.")).Value;
+            haulerImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Hauler)"), 1f, new ConfigDescription("Affects knockback force when colliding with things.")).Value;
+            impactFriendlyFireEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire"), false, new ConfigDescription("Colliding with teammates sends them flying.")).Value;
+            impactFriendlyFirePotmobileEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire (Vehicles)"), true, new ConfigDescription("Colliding with teammate Potmobiles and Haulers sends them flying.")).Value;
 
             potSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Potmobile)"), 9999f, new ConfigDescription("Position of Potmobile in the Survivor Select menu.")).Value;
             haulSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Hauler)"), 10000f, new ConfigDescription("Position of Hauler in the Survivor Select menu.")).Value;
@@ -371,7 +377,7 @@ namespace Potmobile
             cb.baseNameToken = "MOFFEINHAULERBODY_NAME";
             cb.subtitleNameToken = "MOFFEINHAULERBODY_SUBTITLE";
             cb.baseMaxHealth = 600f;
-            cb.levelMaxHealth = 185f;
+            cb.levelMaxHealth = 180f;
             cb.baseArmor = 20;
             cb.levelArmor = 0f;
             cb.baseRegen = 1f;
@@ -524,6 +530,60 @@ namespace Potmobile
                     }
                 }
             }
+        }
+
+        private void FixVehicleForceZoneFriendlyFire()
+        {
+            //If both are true, just use Vanilla behavior
+            if (impactFriendlyFireEnabled && impactFriendlyFirePotmobileEnabled) return;
+
+            On.RoR2.VehicleForceZone.OnCollisionEnter += (orig, self, collision) =>
+            {
+                if (collision.collider)
+                {
+                    CharacterBody victimBody = collision.collider.GetComponent<CharacterBody>();
+                    if (victimBody)
+                    {
+                        CharacterBody attackerBody = self.GetComponentInParent<CharacterBody>();
+                        if (attackerBody)
+                        {
+                            bool isFriendly = attackerBody.teamComponent && victimBody.teamComponent && attackerBody.teamComponent.teamIndex == victimBody.teamComponent.teamIndex;
+                            bool isVehicle = victimBody.bodyIndex == PotmobileContent.PotmobileBodyIndex || victimBody.bodyIndex == PotmobileContent.HaulerBodyIndex;
+
+                            if (isFriendly && ((isVehicle && !impactFriendlyFirePotmobileEnabled) || (!isVehicle && !impactFriendlyFireEnabled)))
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                orig(self, collision);
+            };
+
+            On.RoR2.VehicleForceZone.OnTriggerEnter += (orig, self, other) =>
+            {
+                if (other)
+                {
+                    CharacterBody victimBody = other.GetComponent<CharacterBody>();
+                    if (victimBody)
+                    {
+                        CharacterBody attackerBody = self.GetComponentInParent<CharacterBody>();
+                        if (attackerBody)
+                        {
+                            bool isFriendly = attackerBody.teamComponent && victimBody.teamComponent && attackerBody.teamComponent.teamIndex == victimBody.teamComponent.teamIndex;
+                            bool isVehicle = victimBody.bodyIndex == PotmobileContent.PotmobileBodyIndex || victimBody.bodyIndex == PotmobileContent.HaulerBodyIndex;
+
+                            if (isFriendly && ((isVehicle && !impactFriendlyFirePotmobileEnabled) || (!isVehicle && !impactFriendlyFireEnabled)))
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                orig(self, other);
+            };
         }
 
         private void ContentManager_collectContentPackProviders(RoR2.ContentManagement.ContentManager.AddContentPackProviderDelegate addContentPackProvider)
