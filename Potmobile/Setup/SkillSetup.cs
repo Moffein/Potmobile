@@ -153,7 +153,7 @@ namespace Potmobile
             secondaryDef.isCombatSkill = false;
             secondaryDef.cancelSprintingOnActivation = false;
             secondaryDef.canceledFromSprinting = false;
-            secondaryDef.mustKeyPress = false;
+            secondaryDef.mustKeyPress = true;
             secondaryDef.requiredStock = 1;
             secondaryDef.stockToConsume = 1;
             secondaryDef.keywordTokens = new string[] { };

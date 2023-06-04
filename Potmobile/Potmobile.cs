@@ -17,7 +17,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.2.6")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
     public class Potmobile : BaseUnityPlugin
@@ -92,6 +92,7 @@ namespace Potmobile
             haulerImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Hauler)"), 1f, new ConfigDescription("Affects knockback force when colliding with things.")).Value;
             impactFriendlyFireEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire"), false, new ConfigDescription("Colliding with teammates sends them flying.")).Value;
             impactFriendlyFirePotmobileEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire (Vehicles)"), true, new ConfigDescription("Colliding with teammate Potmobiles and Haulers sends them flying.")).Value;
+            EntityStates.MoffeinPotmobile.Boost.Reset.resetVelocity = base.Config.Bind<bool>(new ConfigDefinition("General", "Special Reset Velocity"), true, new ConfigDescription("Reset velocity to 0 when using the Special."));    //Place this in General so config is only 1 page.
 
             potSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Potmobile)"), 9999f, new ConfigDescription("Position of Potmobile in the Survivor Select menu.")).Value;
             haulSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Hauler)"), 10000f, new ConfigDescription("Position of Hauler in the Survivor Select menu.")).Value;
@@ -174,6 +175,7 @@ namespace Potmobile
         {
             ModSettingsManager.SetModIcon(Assets.assetBundle.LoadAsset<Sprite>("texIconPotmobile.png"));
             ModSettingsManager.AddOption(new RiskOfOptions.Options.KeyBindOption(honkButton));
+            ModSettingsManager.AddOption(new RiskOfOptions.Options.CheckBoxOption(EntityStates.MoffeinPotmobile.Boost.Reset.resetVelocity));
         }
 
         private void LateSetup()
