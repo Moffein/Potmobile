@@ -17,7 +17,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.1")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.2")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
     public class Potmobile : BaseUnityPlugin
@@ -36,8 +36,9 @@ namespace Potmobile
         public static bool fixJumpPad = true;
         public static bool impactFriendlyFireEnabled = false;
         public static bool impactFriendlyFirePotmobileEnabled = true;
+        public static float haulerForce, potmobileForce;
 
-        public static float potmobileImpactMult, haulerImpactMult;
+        public static float potmobileImpactMult, haulerImpactMult, potmobileMinDamageSpeed, haulerMinDamageSpeed, potmobileDoubleDamageSpeed, haulerDoubleDamageSpeed, potmobileMinRamDamage, haulerMinRamDamage, potmobileReverseCoefficient, haulerReverseCoefficient;
 
         public static bool ramEnabled = true;
         public static bool ramDisableOnEnemies = true;
@@ -124,6 +125,18 @@ namespace Potmobile
             specialStocks = base.Config.Bind<int>(new ConfigDefinition("Stats", "Special Stocks"), 1, new ConfigDescription("How many charges this skill has.")).Value;
             specialCooldown = base.Config.Bind<float>(new ConfigDefinition("Stats", "Special Cooldown"), 5f, new ConfigDescription("How long this skill takes to recharge.")).Value;
 
+            potmobileForce = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Motor Force"), 15000f, new ConfigDescription("Affects the speed of this vehicle.")).Value;
+            potmobileMinDamageSpeed = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Min Ram Speed"), 10f, new ConfigDescription("Minimum speed to deal ram damage with this vehicle.")).Value;
+            potmobileDoubleDamageSpeed = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Double Damage Ram Speed"), 20f, new ConfigDescription("Speed at which ramming damage is doubled.")).Value;
+            potmobileMinRamDamage = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Min Ram Damage Coefficient"), 3f, new ConfigDescription("Damage dealt when ramming at minimum speed.")).Value;
+            potmobileReverseCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Reverse Speed Coefficient"), 0.5f, new ConfigDescription("Motor force is multiplied by this when reversing.")).Value;
+
+            haulerForce = base.Config.Bind<float>(new ConfigDefinition("Stats - Hauler", "Motor Force"), 3000f, new ConfigDescription("Affects the speed of this vehicle.")).Value;
+            haulerMinDamageSpeed = base.Config.Bind<float>(new ConfigDefinition("Stats - Hauler", "Min Ram Speed"), 10f, new ConfigDescription("Minimum speed to deal ram damage with this vehicle.")).Value;
+            haulerDoubleDamageSpeed = base.Config.Bind<float>(new ConfigDefinition("Stats - Hauler", "Double Damage Ram Speed"), 20f, new ConfigDescription("Speed at which ramming damage is doubled.")).Value;
+            haulerMinRamDamage = base.Config.Bind<float>(new ConfigDefinition("Stats - Hauler", "Min Ram Damage Coefficient"), 4.5f, new ConfigDescription("Damage dealt when ramming at minimum speed.")).Value;
+            haulerReverseCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats - Hauler", "Reverse Speed Coefficient"), 0.8f, new ConfigDescription("Motor force is multiplied by this when reversing.")).Value;
+
             EnemySetup.enableEnemy = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Enable"), false, new ConfigDescription("Adds Potmobiles and Haulers to the enemy spawn pool.")).Value;
             EnemySetup.enableDissonance = base.Config.Bind<bool>(new ConfigDefinition("Enemy", "Dissonance"), true, new ConfigDescription("Adds Potmobiles and Haulers to the Dissonance spawn pool if the enemy is enabled.")).Value;
             EnemySetup.potmobileCost = base.Config.Bind<int>(new ConfigDefinition("Enemy", "Director Cost (Potmobile)"), 80, new ConfigDescription("Cost of spawning a Potmobile.")).Value;
@@ -194,10 +207,11 @@ namespace Potmobile
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileBody", true);
 
             SpeedController sc = bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
-            sc.minOverlapDamageCoefficient = 3f;
-            sc.minOverlapSpeed = 10f;
-            sc.doubleDamageOverlapSpeed = 20f;
+            sc.minOverlapDamageCoefficient = potmobileMinRamDamage;
+            sc.minOverlapSpeed = potmobileMinDamageSpeed;
+            sc.doubleDamageOverlapSpeed = potmobileDoubleDamageSpeed;
             sc.ramHitboxSize = new Vector3(6f, 3f, 6f);
+            sc.reverseSpeedCoefficient = potmobileReverseCoefficient;
 
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
@@ -318,6 +332,9 @@ namespace Potmobile
                 vfz.impactMultiplier = potmobileImpactMult;
             }
 
+            HoverVehicleMotor hvm = bodyObject.GetComponent<HoverVehicleMotor>();
+            hvm.motorForce = potmobileForce;
+
             PotmobileContent.PotmobileBodyObject = bodyObject;
         }
         private void CreatePotmobileSurvivorDef()
@@ -345,10 +362,10 @@ namespace Potmobile
             GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerBody", true);
 
             SpeedController sc = bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
-            sc.minOverlapDamageCoefficient = 4.5f;
-            sc.minOverlapSpeed = 10f;
-            sc.doubleDamageOverlapSpeed = 20f;
-            sc.reverseSpeedCoefficient = 0.8f;
+            sc.minOverlapDamageCoefficient = haulerMinRamDamage;
+            sc.minOverlapSpeed = haulerMinDamageSpeed;
+            sc.doubleDamageOverlapSpeed = haulerDoubleDamageSpeed;
+            sc.reverseSpeedCoefficient = haulerReverseCoefficient;
             sc.ramHitboxSize = new Vector3(7.7f, 4.2f, 14f);
 
             bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
@@ -478,6 +495,9 @@ namespace Potmobile
             {
                 vfz.impactMultiplier = haulerImpactMult;
             }
+
+            HoverVehicleMotor hvm = bodyObject.GetComponent<HoverVehicleMotor>();
+            hvm.motorForce = haulerForce;
 
             PotmobileContent.HaulerBodyObject = bodyObject;
         }
