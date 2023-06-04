@@ -9,12 +9,15 @@ namespace EntityStates.MoffeinPotmobile.Boost
     {
         public static GameObject effectPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Huntress/HuntressBlinkEffect.prefab").WaitForCompletion();
         public static ConfigEntry<bool> resetVelocity;
+        public static float baseDuration = 2f;
+        private bool buttonReleased;
 
         public override void OnEnter()
         {
             base.OnEnter();
 
             Util.PlaySound("Play_huntress_shift_mini_blink", base.gameObject);
+            buttonReleased = false;
             if (base.transform) EffectManager.SimpleEffect(effectPrefab, base.transform.position, base.transform.rotation, false);
 
             if (base.isAuthority)
@@ -39,19 +42,25 @@ namespace EntityStates.MoffeinPotmobile.Boost
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-            if (base.isAuthority && base.fixedAge >= 2f)
+            if (base.isAuthority)
             {
-                this.outer.SetNextStateToMain();
+                if (base.inputBank && !base.inputBank.skill4.down) buttonReleased = true;
+
+                if (base.fixedAge >= baseDuration)
+                {
+                    this.outer.SetNextStateToMain();
+                    return;
+                }
             }
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()
         {
-            if (base.inputBank && base.inputBank.skill4.down)
+            if (buttonReleased)
             {
-                return InterruptPriority.PrioritySkill;
+                return InterruptPriority.Any;
             }
-            return InterruptPriority.Any;
+            return InterruptPriority.PrioritySkill;
         }
     }
 }

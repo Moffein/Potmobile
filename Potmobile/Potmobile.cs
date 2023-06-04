@@ -94,7 +94,7 @@ namespace Potmobile
             impactFriendlyFirePotmobileEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire (Vehicles)"), true, new ConfigDescription("Colliding with teammate Potmobiles and Haulers sends them flying.")).Value;
 
             //Place these in General so config is only 1 page.
-            EntityStates.MoffeinPotmobile.Boost.Reset.resetVelocity = base.Config.Bind<bool>(new ConfigDefinition("General", "Special Reset Velocity"), true, new ConfigDescription("Reset velocity to 0 when using the Special."));
+            EntityStates.MoffeinPotmobile.Boost.Reset.resetVelocity = base.Config.Bind<bool>(new ConfigDefinition("General", "Special Reset Velocity"), false, new ConfigDescription("Reset velocity to 0 when using the Special."));
 
             potSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Potmobile)"), 9999f, new ConfigDescription("Position of Potmobile in the Survivor Select menu.")).Value;
             haulSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Hauler)"), 10000f, new ConfigDescription("Position of Hauler in the Survivor Select menu.")).Value;

@@ -13,14 +13,17 @@ namespace EntityStates.MoffeinPotmobile.Weapon
         public static float jumpVelocity = 32f;
         public static float radius = 12f;
         private float duration;
+        private bool buttonReleased;
 
         public override void OnEnter()
         {
             base.OnEnter();
             duration = baseDuration / this.attackSpeedStat;
+            buttonReleased = false;
 
             if (base.isAuthority)
             {
+
                 EffectManager.SpawnEffect(effectPrefab, new EffectData { origin = base.transform.position, scale = radius }, true);
                 BlastAttack ba = new BlastAttack
                 {
@@ -56,20 +59,25 @@ namespace EntityStates.MoffeinPotmobile.Weapon
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-            if (base.fixedAge >= duration)
+            if (base.isAuthority)
             {
-                this.outer.SetNextStateToMain();
-                return;
+                if (base.inputBank && !base.inputBank.skill2.down) buttonReleased = true;
+
+                if (base.fixedAge >= duration)
+                {
+                    this.outer.SetNextStateToMain();
+                    return;
+                }
             }
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()
         {
-            if (base.inputBank && base.inputBank.skill2.down)
+            if (buttonReleased)
             {
-                return InterruptPriority.PrioritySkill;
+                return InterruptPriority.Any;
             }
-            return InterruptPriority.Any;
+            return InterruptPriority.PrioritySkill;
         }
     }
 }
