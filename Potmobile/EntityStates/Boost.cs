@@ -85,7 +85,7 @@ namespace EntityStates.MoffeinPotmobile.Boost
         public static float forceMultiplier = 2f;
 
         public static GameObject trailPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/missileexplosionvfx");
-        public static float trailFrequency = 10f;
+        public static float trailFrequency = 20f;
         private float trailStopwatch;
         private float trailTime;
         private float maxSpeedDuringState;

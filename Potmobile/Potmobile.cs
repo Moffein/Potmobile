@@ -17,7 +17,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.0")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.1")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
     public class Potmobile : BaseUnityPlugin
