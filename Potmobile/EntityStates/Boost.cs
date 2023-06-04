@@ -2,6 +2,7 @@
 using RoR2;
 using UnityEngine.Networking;
 using Potmobile.Components;
+using BepInEx.Configuration;
 
 namespace EntityStates.MoffeinPotmobile.Boost
 {
@@ -32,10 +33,13 @@ namespace EntityStates.MoffeinPotmobile.Boost
                 }, false);
                 this.trailStopwatch -= trailTime;
             }
-            if (base.isAuthority && base.fixedAge >= baseDuration)
+            if (base.isAuthority)
             {
-                this.outer.SetNextStateToMain();
-                return;
+                if (base.fixedAge >= baseDuration)
+                {
+                    this.outer.SetNextStateToMain();
+                    return;
+                }
             }
         }
 
