@@ -33,14 +33,25 @@ namespace EntityStates.MoffeinPotmobile.Boost
                         base.rigidbody.velocity = Vector3.zero;
                     }
                 }
+            }
+        }
 
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            if (base.isAuthority && base.fixedAge >= 2f)
+            {
                 this.outer.SetNextStateToMain();
             }
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()
         {
-            return InterruptPriority.PrioritySkill;
+            if (base.inputBank && base.inputBank.skill4.down)
+            {
+                return InterruptPriority.PrioritySkill;
+            }
+            return InterruptPriority.Any;
         }
     }
 }

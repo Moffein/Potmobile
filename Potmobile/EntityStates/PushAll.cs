@@ -9,7 +9,7 @@ namespace EntityStates.MoffeinPotmobile.Weapon
     {
         public static GameObject effectPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerMineExplosion.prefab").WaitForCompletion();
         public static float force = 4500f;
-        public static float baseDuration = 0.5f;
+        public static float baseDuration = 2f;
         public static float jumpVelocity = 32f;
         public static float radius = 12f;
         private float duration;
@@ -65,7 +65,11 @@ namespace EntityStates.MoffeinPotmobile.Weapon
 
         public override InterruptPriority GetMinimumInterruptPriority()
         {
-            return InterruptPriority.PrioritySkill;
+            if (base.inputBank && base.inputBank.skill2.down)
+            {
+                return InterruptPriority.PrioritySkill;
+            }
+            return InterruptPriority.Any;
         }
     }
 }
