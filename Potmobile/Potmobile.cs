@@ -17,7 +17,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.2")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.3")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
     public class Potmobile : BaseUnityPlugin
@@ -128,8 +128,8 @@ namespace Potmobile
             potmobileForce = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Motor Force"), 15000f, new ConfigDescription("Affects the speed of this vehicle.")).Value;
             potmobileMinDamageSpeed = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Min Ram Speed"), 10f, new ConfigDescription("Minimum speed to deal ram damage with this vehicle.")).Value;
             potmobileDoubleDamageSpeed = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Double Damage Ram Speed"), 20f, new ConfigDescription("Speed at which ramming damage is doubled.")).Value;
-            potmobileMinRamDamage = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Min Ram Damage Coefficient"), 3f, new ConfigDescription("Damage dealt when ramming at minimum speed.")).Value;
-            potmobileReverseCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Reverse Speed Coefficient"), 0.5f, new ConfigDescription("Motor force is multiplied by this when reversing.")).Value;
+            potmobileMinRamDamage = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Min Ram Damage Coefficient"), 4.5f, new ConfigDescription("Damage dealt when ramming at minimum speed.")).Value;
+            potmobileReverseCoefficient = base.Config.Bind<float>(new ConfigDefinition("Stats - Potmobile", "Reverse Speed Coefficient"), 0.8f, new ConfigDescription("Motor force is multiplied by this when reversing.")).Value;
 
             haulerForce = base.Config.Bind<float>(new ConfigDefinition("Stats - Hauler", "Motor Force"), 3000f, new ConfigDescription("Affects the speed of this vehicle.")).Value;
             haulerMinDamageSpeed = base.Config.Bind<float>(new ConfigDefinition("Stats - Hauler", "Min Ram Speed"), 10f, new ConfigDescription("Minimum speed to deal ram damage with this vehicle.")).Value;
@@ -382,9 +382,29 @@ namespace Potmobile
             //Fix Out of Bounds teleport
             bodyObject.layer = 0;
 
-            //Add charactermodel. Does this do anything?
-            CharacterModel characterModel = bodyObject.AddComponent<CharacterModel>();
-            characterModel.baseRendererInfos = bodyObject.GetComponentInChildren<CharacterModel>().baseRendererInfos;
+            ChildLocator childLocator = bodyObject.GetComponent<ChildLocator>();
+            if (childLocator)
+            {
+                Transform t = childLocator.FindChild("mdlHauler");
+                if (t && t.gameObject)
+                {
+                    CharacterModel characterModel = t.gameObject.AddComponent<CharacterModel>();
+                    MeshRenderer[] meshRenderers = t.gameObject.GetComponentsInChildren<MeshRenderer>();
+                    if (meshRenderers.Length > 0)
+                    {
+                        List<CharacterModel.RendererInfo> rendererInfos = new List<CharacterModel.RendererInfo>();
+                        foreach (MeshRenderer mesh in meshRenderers)
+                        {
+                            CharacterModel.RendererInfo rendererInfo = new CharacterModel.RendererInfo();
+                            rendererInfo.renderer = mesh;
+                            rendererInfo.defaultMaterial = mesh.material;
+                            rendererInfo.defaultShadowCastingMode = mesh.shadowCastingMode;
+                            rendererInfo.ignoreOverlays = !mesh.isVisible;
+                        }
+                        characterModel.baseRendererInfos = rendererInfos.ToArray();
+                    }
+                }
+            }
 
             CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
             cb.bodyColor = new Color32(34, 71, 224, 255);
