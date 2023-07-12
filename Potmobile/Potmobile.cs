@@ -382,11 +382,11 @@ namespace Potmobile
             //Fix Out of Bounds teleport
             bodyObject.layer = 0;
 
-            ChildLocator childLocator = bodyObject.GetComponent<ChildLocator>();
+            ChildLocator childLocator = bodyObject.GetComponentInChildren<ChildLocator>();
             if (childLocator)
             {
-                Transform t = childLocator.FindChild("mdlHauler");
-                if (t && t.gameObject)
+                Transform t = childLocator.gameObject.transform;
+                if (t)
                 {
                     CharacterModel characterModel = t.gameObject.AddComponent<CharacterModel>();
                     MeshRenderer[] meshRenderers = t.gameObject.GetComponentsInChildren<MeshRenderer>();
@@ -399,7 +399,6 @@ namespace Potmobile
                             rendererInfo.renderer = mesh;
                             rendererInfo.defaultMaterial = mesh.material;
                             rendererInfo.defaultShadowCastingMode = mesh.shadowCastingMode;
-                            rendererInfo.ignoreOverlays = !mesh.isVisible;
                         }
                         characterModel.baseRendererInfos = rendererInfos.ToArray();
                     }
