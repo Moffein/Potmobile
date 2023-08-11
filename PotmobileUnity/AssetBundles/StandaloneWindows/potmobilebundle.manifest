@@ -1,21 +1,39 @@
 ManifestFileVersion: 0
-CRC: 2642591304
+CRC: 1355366541
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 2d94ca424851ad52f960d63696bbad55
+    Hash: 2b1c5b26f2b6cb512ed89cc576a705ef
   TypeTreeHash:
     serializedVersion: 2
-    Hash: c90fc19e2679e5295d10bd00f33cb4c3
+    Hash: 1fe3abd029edb3522ae5dbbc711d0a74
 HashAppended: 0
 ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
 - Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
   Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/Resources/texIconJeep.png
 - Assets/Resources/texIconPrimaryScepter.png
 - Assets/Resources/texIconPotmobile.png
+- Assets/Resources/mdlHaulerJeep.prefab
 - Assets/Resources/texIconHauler.png
+- Assets/Resources/mdlHaulerJeep.fbx
+- Assets/Resources/HaulerMesh.obj
 Dependencies: []
