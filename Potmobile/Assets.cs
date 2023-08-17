@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace Potmobile
@@ -6,6 +7,8 @@ namespace Potmobile
     public class Assets
     {
         public static AssetBundle assetBundle;
+        public static Mesh jeepMesh;
+
         internal static string assemblyDir
         {
             get
@@ -28,6 +31,12 @@ namespace Potmobile
                 bankStream.Read(bytes, 0, bytes.Length);
                 R2API.SoundAPI.SoundBanks.Add(bytes);
             }
+            LoadAssets();
+        }
+
+        private static void LoadAssets()
+        {
+            jeepMesh = Assets.assetBundle.LoadAsset<Mesh>("Assets/Resources/mdlHaulerJeep.fbx");
         }
     }
 }
