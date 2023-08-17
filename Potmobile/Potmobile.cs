@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using EntityStates;
 using Potmobile.Components;
+using Potmobile.Cores;
 using R2API;
 using R2API.Utils;
 using RiskOfOptions;
@@ -17,6 +18,7 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.Mico27.RideMeExtended", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.3")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
@@ -25,6 +27,7 @@ namespace Potmobile
         public static bool classicItemsLoaded = false;
         public static bool scepterPluginLoaded = false;
         public static bool riskOfOptionsLoaded = false;
+        public static bool rideMeExtendedLoaded = false;
 
         public static PluginInfo pluginInfo;
         public static float potSortPosition = 9999f;
@@ -54,6 +57,7 @@ namespace Potmobile
             scepterPluginLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.DestroyedClone.AncientScepter");
             riskOfOptionsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.rune580.riskofoptions");
             classicItemsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.ThinkInvisible.ClassicItems");
+            rideMeExtendedLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.Mico27.RideMeExtended");
 
             pluginInfo = Info;
             Assets.Init();
@@ -70,15 +74,19 @@ namespace Potmobile
 
             //Hauler
             BuildHaulerBodyObject();
-            Skins.InitSkins(PotmobileContent.HaulerBodyObject); //Has no CharacterModel, likely incompatible with skins.
+            Skins.InitSkins(PotmobileContent.HaulerBodyObject);
             CreateHaulerSurvivorDef();
             HaulerSkillSetup();
             MasterSetup.CreateHaulerMaster();
+
+            RoR2.ContentManagement.ContentManager.onContentPacksAssigned += ContentManager_onContentPacksAssigned;
 
             FixJumpPad();
             EnemySetup.Init();
 
             FixVehicleForceZoneFriendlyFire();
+
+            new ItemDisplayCore();
 
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
@@ -356,6 +364,11 @@ namespace Potmobile
             PotmobileContent.PotmobileSurvivorDef = sd;
         }
 
+        private void ContentManager_onContentPacksAssigned(HG.ReadOnlyArray<RoR2.ContentManagement.ReadOnlyContentPack> obj)
+        {
+            HaulerItemDisplays.RegisterDisplays();
+        }
+
         private void BuildHaulerBodyObject()
         {
             if (PotmobileContent.HaulerBodyObject) return;
@@ -382,28 +395,175 @@ namespace Potmobile
             //Fix Out of Bounds teleport
             bodyObject.layer = 0;
 
-            ChildLocator childLocator = bodyObject.GetComponentInChildren<ChildLocator>();
-            if (childLocator)
+            //Syncing with Jellyfish (closest example)
+            SfxLocator sfxLocator = bodyObject.AddComponent<SfxLocator>();
+            Transform modelBaseTransform = bodyObject.transform.Find("Model Base");
+            Transform mdlHaulerTransform = bodyObject.transform.Find("Model Base/mdlHauler");
+            Transform haulerMeshTransform = bodyObject.transform.Find("Model Base/mdlHauler/HaulerMesh");
+
+            //maybe this is stupid
+            //var cacheMesh = haulerMeshTransform.GetComponent<MeshFilter>().sharedMesh;
+            //var cacheRenderer = haulerMeshTransform.GetComponent<MeshRenderer>().sharedMaterials;
+            //var smr = haulerMeshTransform.gameObject.AddComponent<SkinnedMeshRenderer>();
+            //smr.sharedMesh = cacheMesh;
+            //smr.sharedMaterials = cacheRenderer;
+            //Destroy(haulerMeshTransform.GetComponent<MeshFilter>());
+            //Destroy(haulerMeshTransform.GetComponent<MeshRenderer>());
+
+
+            Transform AddChild(Transform parent, string name)
             {
-                Transform t = childLocator.gameObject.transform;
-                if (t)
-                {
-                    CharacterModel characterModel = t.gameObject.AddComponent<CharacterModel>();
-                    MeshRenderer[] meshRenderers = t.gameObject.GetComponentsInChildren<MeshRenderer>();
-                    if (meshRenderers.Length > 0)
-                    {
-                        List<CharacterModel.RendererInfo> rendererInfos = new List<CharacterModel.RendererInfo>();
-                        foreach (MeshRenderer mesh in meshRenderers)
-                        {
-                            CharacterModel.RendererInfo rendererInfo = new CharacterModel.RendererInfo();
-                            rendererInfo.renderer = mesh;
-                            rendererInfo.defaultMaterial = mesh.material;
-                            rendererInfo.defaultShadowCastingMode = mesh.shadowCastingMode;
-                        }
-                        characterModel.baseRendererInfos = rendererInfos.ToArray();
-                    }
-                }
+                var go = new GameObject(name);
+                var got = go.transform;
+                got.SetParent(parent);
+                got.localPosition = Vector3.zero;
+                got.localRotation = Quaternion.identity;
+                return got;
             }
+            Transform armatureTransform = AddChild(mdlHaulerTransform, "HaulerArmature");
+            Transform seatDriver = AddChild(armatureTransform, "Seat.Driver");
+            Transform seatShotgun = AddChild(armatureTransform, "Seat.Shotgun");
+            Transform seatBackDriver = AddChild(armatureTransform, "Seat.BackDriver");
+            Transform seatBackShotgun = AddChild(armatureTransform, "Seat.BackShotgun");
+            Transform exhaustTransform = AddChild(armatureTransform, "ExhaustPoint");
+
+            Transform wheelFrontL = mdlHaulerTransform.Find("Front.L");
+            // this / WheelContactPoint / HaulerWheelMesh
+            //meshfilter/meshrenderer
+            Transform wheelFrontR = mdlHaulerTransform.Find("Front.R");
+            Transform wheelBackL = mdlHaulerTransform.Find("Back.L");
+            Transform wheelBackR = mdlHaulerTransform.Find("Back.R");
+            void GetWheelComponents(Transform wheelTransform, out MeshFilter meshFilter, out MeshRenderer meshRenderer)
+            {
+                var target = wheelTransform.Find("WheelContactPoint/HaulerWheelMesh");
+                meshFilter = target.GetComponent<MeshFilter>();
+                meshRenderer = target.GetComponent<MeshRenderer>();
+            }
+
+            if (modelBaseTransform.GetComponent<ChildLocator>())
+            {
+                Debug.Log($"Base Transform has ChildLocator, deleting.");
+                Destroy(modelBaseTransform.GetComponent<ChildLocator>());
+            }
+            ChildLocator childLocator = mdlHaulerTransform.GetComponent<ChildLocator>();
+            if (!mdlHaulerTransform.GetComponent<ChildLocator>())
+            {
+                Debug.Log("mdlHauler missing childlocator, adding.");
+                childLocator = mdlHaulerTransform.gameObject.AddComponent<ChildLocator>();
+            }
+            childLocator.transformPairs = new ChildLocator.NameTransformPair[]
+            {
+                new ChildLocator.NameTransformPair
+                {
+                    name = "armatureRoot",
+                    transform = armatureTransform,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "SeatDriver",
+                    transform = seatDriver,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "SeatShotgun",
+                    transform = seatShotgun,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "SeatBackDriver",
+                    transform = seatBackDriver,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "SeatBackShotgun",
+                    transform = seatBackShotgun,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "WheelFrontL",
+                    transform = wheelFrontL,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "WheelFrontR",
+                    transform = wheelFrontR,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "WheelBackL",
+                    transform = wheelBackL,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "WheelBackR",
+                    transform = wheelBackR,
+                },
+                new ChildLocator.NameTransformPair
+                {
+                    name = "ExhautPoint",
+                    transform = exhaustTransform
+                }
+            };
+            CharacterModel characterModel = mdlHaulerTransform.GetComponent<CharacterModel>();
+            if (!characterModel) Debug.Log($"{mdlHaulerTransform.name} does not have a CharacterModel. adding.");
+            characterModel = mdlHaulerTransform.gameObject.AddComponent<CharacterModel>();
+            characterModel.body = bodyObject.GetComponent<CharacterBody>();
+
+            //set in awake to first in baserendererinfos
+            //characterModel.mainSkinnedMeshRenderer = smr;
+
+            //FUCK
+            //EVERYTHING
+            //
+            // ☆*: .｡. o(≧▽≦)o .｡.:*☆
+            //
+            var jeepPrefab = UnityEngine.Object.Instantiate(Assets.assetBundle.LoadAsset<GameObject>("mdlHaulerJeep.prefab"), mdlHaulerTransform);
+            jeepPrefab.transform.localPosition = Vector3.zero;
+            jeepPrefab.SetActive(false);
+
+            //ModelPanelParameters modelPanelParameters = mdlHaulerTransform.gameObject.AddComponent<ModelPanelParameters>();
+            //needs to be configured. or else it throws something
+
+            //no point in doing auto if we're doing gameobjectactivation skindef jank
+            GetWheelComponents(wheelFrontL, out MeshFilter _, out MeshRenderer wheelFrontLMR);
+            GetWheelComponents(wheelFrontR, out MeshFilter _, out MeshRenderer wheelFrontRMR);
+            GetWheelComponents(wheelBackL, out MeshFilter _, out MeshRenderer wheelBackLMR);
+            GetWheelComponents(wheelBackR, out MeshFilter _, out MeshRenderer wheelBackRMR);
+
+            List<CharacterModel.RendererInfo> rendererInfos = new List<CharacterModel.RendererInfo>();
+            MeshRenderer[] meshRenderers = new MeshRenderer[] { wheelFrontLMR, wheelFrontRMR, wheelBackLMR, wheelBackRMR };
+
+            foreach (var renderer in meshRenderers)
+            {
+                CharacterModel.RendererInfo rendererInfo = new CharacterModel.RendererInfo
+                {
+                    renderer = renderer,
+                    defaultMaterial = renderer.sharedMaterial,
+                    defaultShadowCastingMode = renderer.shadowCastingMode
+                };
+                rendererInfos.Add(rendererInfo);
+            }
+
+            /*
+            MeshRenderer[] meshRenderers = mdlHaulerTransform.GetComponentsInChildren<MeshRenderer>();
+            List<CharacterModel.RendererInfo> rendererInfos = new List<CharacterModel.RendererInfo>();
+            for (int i = meshRenderers.Length - 1; i >= 0; i--)
+            {
+                MeshRenderer mesh = meshRenderers[i];
+                CharacterModel.RendererInfo rendererInfo = new CharacterModel.RendererInfo
+                {
+                    renderer = mesh,
+                    defaultMaterial = mesh.sharedMaterial,
+                    defaultShadowCastingMode = mesh.shadowCastingMode
+                };
+                if (rendererInfo.renderer.name == "HaulerMesh") continue;
+                //Skipping because the first SMR seemingly vanishes afterwards ???, but doesnt get set... so.. why???
+                //rendererInfo.renderer = smr;
+                rendererInfos.Add(rendererInfo);
+                Debug.Log($"Adding base renderer info for renderer {rendererInfo.renderer.name}");
+            }*/
+
+            characterModel.baseRendererInfos = rendererInfos.ToArray();
 
             CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
             cb.bodyColor = new Color32(34, 71, 224, 255);
@@ -521,11 +681,21 @@ namespace Potmobile
             PotmobileContent.HaulerBodyObject = bodyObject;
         }
 
+
         private void CreateHaulerSurvivorDef()
         {
-            GameObject displayObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerDisplay", false);
-            displayObject = displayObject.GetComponent<ModelLocator>().modelTransform.gameObject;
+            //GameObject displayObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerDisplay", false);
+            //displayObject = displayObject.GetComponent<ModelLocator>().modelTransform.gameObject;
+            //displayObject.transform.localScale *= 0.25f;
+            GameObject displayObject = PrefabAPI.InstantiateClone(PotmobileContent.HaulerBodyObject.transform.Find("Model Base").gameObject, "MoffeinHaulerDisplay");
             displayObject.transform.localScale *= 0.25f;
+            var mdlHauler = displayObject.transform.Find("mdlHauler");
+            mdlHauler.transform.localPosition = Vector3.up;
+            mdlHauler.GetComponent<HurtBoxGroup>().enabled = false;
+            mdlHauler.GetComponent<HurtBox>().enabled = false;
+            //mdlHauler.transform.Find("Front.L").GetComponent<HoverEngine>().enabled = false;
+            mdlHauler.transform.Find("ForceBox").gameObject.SetActive(false);
+
 
             SurvivorDef sd = ScriptableObject.CreateInstance<SurvivorDef>();
             sd.cachedName = "MoffeinHauler";

@@ -10,6 +10,30 @@ namespace Potmobile
     //Based off of HenryMod code.
     public class Skins
     {
+        public static SkinDef jeepSkinDef;
+
+        public enum SkinGOSelection
+        {
+            Base,
+            Jeep
+        }
+
+        public static void SetupJankGOToggles(SkinDef skinDef, SkinGOSelection index)
+        {
+            skinDef.gameObjectActivations = new SkinDef.GameObjectActivation[]
+            {
+                new SkinDef.GameObjectActivation
+                {
+                    gameObject = PotmobileContent.HaulerBodyObject.transform.Find("Model Base/mdlHauler/HaulerMesh").gameObject,
+                    shouldActivate = index == SkinGOSelection.Base
+                },
+                new SkinDef.GameObjectActivation
+                {
+                    gameObject = PotmobileContent.HaulerBodyObject.transform.Find("Model Base/mdlHauler/mdlHaulerJeep(Clone)").gameObject,
+                    shouldActivate = index == SkinGOSelection.Jeep
+                }
+            };
+        }
 
         public static void InitSkins(GameObject bodyPrefab)
         {
@@ -27,7 +51,13 @@ namespace Potmobile
             CharacterModel.RendererInfo[] defaultRenderers = null;
             if (characterModel)
             {
-                mainRenderer = characterModel.mainSkinnedMeshRenderer;
+                //mainRenderer = characterModel.mainSkinnedMeshRenderer;
+                /*if (!mainRenderer && bodyPrefab == PotmobileContent.HaulerBodyObject)
+                {
+                    Debug.Log($"wee woo wee woo");
+                    mainRenderer = bodyPrefab.GetComponentInChildren<SkinnedMeshRenderer>();
+                    if (!mainRenderer) Debug.Log($"uh captain? i do say shit");
+                }*/
                 defaultRenderers = characterModel.baseRendererInfos;
             }
 
@@ -41,8 +71,56 @@ namespace Potmobile
                 model);
 
             defaultSkin.meshReplacements = new SkinDef.MeshReplacement[] { };
-
+            if (bodyPrefab == PotmobileContent.HaulerBodyObject)
+            {
+                SetupJankGOToggles(defaultSkin, SkinGOSelection.Base);
+                MeshRenderer haulerMR = PotmobileContent.HaulerBodyObject.transform.Find("Model Base/mdlHauler/HaulerMesh").GetComponent<MeshRenderer>();
+                var haulerRendererInfo = new CharacterModel.RendererInfo()
+                {
+                    defaultMaterial = haulerMR.sharedMaterial,
+                    defaultShadowCastingMode = haulerMR.shadowCastingMode,
+                    hideOnDeath = false,
+                    ignoreOverlays = false,
+                    renderer = haulerMR
+                };
+                HG.ArrayUtils.ArrayInsert<CharacterModel.RendererInfo>(ref defaultSkin.rendererInfos, 0, in haulerRendererInfo);
+            }
             skins.Add(defaultSkin);
+            #endregion
+
+            #region Hauler Jeep Skin
+
+            if (bodyPrefab == PotmobileContent.HaulerBodyObject)
+            {
+                jeepSkinDef = CreateSkinDef("MOFFEINHAULERBODY_SKIN_GEEP_NAME",
+                Assets.assetBundle.LoadAsset<Sprite>("Assets/Resources/texIconJeep.png"),
+                defaultRenderers,
+                mainRenderer,
+                model);
+                //body + wheels
+
+                var jeepMeshMR = PotmobileContent.HaulerBodyObject.transform.Find("Model Base/mdlHauler/mdlHaulerJeep(Clone)").GetComponent<MeshRenderer>();
+                SetupJankGOToggles(jeepSkinDef, SkinGOSelection.Jeep);
+                var jeepRendererInfo = new CharacterModel.RendererInfo()
+                {
+                    defaultMaterial = jeepMeshMR.sharedMaterial,
+                    defaultShadowCastingMode = jeepMeshMR.shadowCastingMode,
+                    hideOnDeath = false,
+                    ignoreOverlays = false,
+                    renderer = jeepMeshMR
+                };
+                HG.ArrayUtils.ArrayInsert<CharacterModel.RendererInfo>(ref jeepSkinDef.rendererInfos, 0, in jeepRendererInfo);
+                /*jeepSkinDef.meshReplacements = new SkinDef.MeshReplacement[]
+                {
+                    new SkinDef.MeshReplacement
+                    {
+                        mesh = Assets.jeepMesh,
+                        renderer = mainRenderer
+                    }
+                };*/
+                skins.Add(jeepSkinDef);
+            }
+
             #endregion
 
             skinController.skins = skins.ToArray();
@@ -89,6 +167,7 @@ namespace Potmobile
 
             return skinDef;
         }
+
 
         private static void DoNothing(On.RoR2.SkinDef.orig_Awake orig, RoR2.SkinDef self)
         {
