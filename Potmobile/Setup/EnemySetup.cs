@@ -154,7 +154,7 @@ namespace Potmobile
                 }
             }
 
-            foreach (Potmobile.StageSpawnInfo ssi in Potmobile.StageListPotmobile)
+            foreach (PotmobilePlugin.StageSpawnInfo ssi in PotmobilePlugin.StageListPotmobile)
             {
                 DirectorAPI.DirectorCardHolder toAdd = ssi.GetMinStages() == 0 ? PotmobileContent.PotmobileCard : PotmobileContent.PotmobileLoopCard;
 
@@ -164,7 +164,7 @@ namespace Potmobile
                 DirectorAPI.Helpers.AddNewMonsterToStage(toAdd, false, DirectorAPI.GetStageEnumFromSceneDef(sd), ssi.GetStageName());
             }
 
-            foreach (Potmobile.StageSpawnInfo ssi in Potmobile.StageListHauler)
+            foreach (PotmobilePlugin.StageSpawnInfo ssi in PotmobilePlugin.StageListHauler)
             {
                 DirectorAPI.DirectorCardHolder toAdd = ssi.GetMinStages() == 0 ? PotmobileContent.HaulerCard : PotmobileContent.HaulerLoopCard;
 

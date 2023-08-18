@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Potmobile.Cores;
 using System.Runtime.CompilerServices;
 
-namespace Potmobile
+namespace Potmobile.Survivors.Hauler
 {
     internal class HaulerItemDisplays
     {
@@ -350,7 +350,7 @@ localScale = new Vector3(7.39143F, 7.39143F, 7.39143F),
             itemRules.Add(ItemDisplayCore.CreateGenericDisplayRule(DLC1Content.Elites.Earth.eliteEquipmentDef, "DisplayEliteMendingAntlers", "armatureRoot", new Vector3(0F, 3.03717F, 2.52891F), new Vector3(0F, 0F, 0F), new Vector3(2.27016F, 2.27016F, 2.27016F)));
             #endregion
             #region Modded
-            if (Potmobile.scepterPluginLoaded)
+            if (PotmobilePlugin.scepterPluginLoaded)
             {
                 AddScepterItemDisplay();
             }
