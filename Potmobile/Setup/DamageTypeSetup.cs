@@ -55,7 +55,7 @@ namespace Potmobile
                     {
                         if (damageInfo.HasModdedDamageType(PotmobileContent.ModdedDamageTypes.PotmobileRam))
                         {
-                            if (Potmobile.ramDisableAgainstPlayerPotmobiles && self.body.isPlayerControlled && attackerBody.isPlayerControlled)
+                            if (PotmobilePlugin.ramDisableAgainstPlayerPotmobiles && self.body.isPlayerControlled && attackerBody.isPlayerControlled)
                             {
                                 bool attackerIsVehicle = attackerBody.bodyIndex == PotmobileContent.PotmobileBodyIndex || attackerBody.bodyIndex == PotmobileContent.HaulerBodyIndex;
                                 bool victimIsVehicle = self.body.bodyIndex == PotmobileContent.PotmobileBodyIndex || self.body.bodyIndex == PotmobileContent.HaulerBodyIndex;

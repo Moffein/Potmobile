@@ -10,7 +10,7 @@ namespace Potmobile
         {
             get
             {
-                return System.IO.Path.GetDirectoryName(Potmobile.pluginInfo.Location);
+                return System.IO.Path.GetDirectoryName(PotmobilePlugin.pluginInfo.Location);
             }
         }
         internal static string languageRoot => System.IO.Path.Combine(assemblyDir, "language");

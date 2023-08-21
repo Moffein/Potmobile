@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace Potmobile
@@ -6,11 +7,12 @@ namespace Potmobile
     public class Assets
     {
         public static AssetBundle assetBundle;
+
         internal static string assemblyDir
         {
             get
             {
-                return System.IO.Path.GetDirectoryName(Potmobile.pluginInfo.Location);
+                return System.IO.Path.GetDirectoryName(PotmobilePlugin.pluginInfo.Location);
             }
         }
 

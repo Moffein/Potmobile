@@ -74,7 +74,7 @@ namespace Potmobile.Components
                         ramHitbox.transform.localPosition = bc.center;
                         ramHitbox.transform.localRotation = bc.transform.localRotation;
                         ramHitbox.name = "RamHitbox";
-                        Potmobile.SetupHitbox(base.gameObject, "RamHitbox", new Transform[] { ramHitbox.transform });
+                        PotmobilePlugin.SetupHitbox(base.gameObject, "RamHitbox", new Transform[] { ramHitbox.transform });
                     }
                 }
                 hitBoxGroup = base.GetComponent<HitBoxGroup>();
@@ -161,7 +161,7 @@ namespace Potmobile.Components
         {
             bool hitEnemy = false;
             bool isPlayer = body && (body.isPlayerControlled || (body.teamComponent && body.teamComponent.teamIndex == TeamIndex.Player));
-            if (!Potmobile.ramEnabled || !hitBoxGroup || (!isPlayer && Potmobile.ramDisableOnEnemies)) return;
+            if (!PotmobilePlugin.ramEnabled || !hitBoxGroup || (!isPlayer && PotmobilePlugin.ramDisableOnEnemies)) return;
 
             if (!tc) tc = base.GetComponent<TeamComponent>();
             overlapAttack.teamIndex = tc ? tc.teamIndex : TeamIndex.None;
@@ -214,7 +214,7 @@ namespace Potmobile.Components
 
         public void Update()
         {
-            if (HasEffectiveAuthority() && Potmobile.GetKeyPressed(Potmobile.honkButton))
+            if (HasEffectiveAuthority() && PotmobilePlugin.GetKeyPressed(PotmobilePlugin.honkButton))
             {
 
             }

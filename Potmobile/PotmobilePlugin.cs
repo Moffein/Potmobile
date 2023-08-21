@@ -2,6 +2,9 @@
 using BepInEx.Configuration;
 using EntityStates;
 using Potmobile.Components;
+using Potmobile.Cores;
+using Potmobile.Survivors.Hauler;
+using Potmobile.Survivors.Potmobile;
 using R2API;
 using R2API.Utils;
 using RiskOfOptions;
@@ -17,14 +20,17 @@ namespace Potmobile
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.3")]
+    [BepInDependency("com.Mico27.RideMeExtended", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.4.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
-    public class Potmobile : BaseUnityPlugin
+    public class PotmobilePlugin : BaseUnityPlugin
     {
         public static bool classicItemsLoaded = false;
         public static bool scepterPluginLoaded = false;
         public static bool riskOfOptionsLoaded = false;
+        public static bool rideMeExtendedLoaded = false;
 
         public static PluginInfo pluginInfo;
         public static float potSortPosition = 9999f;
@@ -47,6 +53,8 @@ namespace Potmobile
         public static int secondaryStocks, utilityStocks, specialStocks;
         public static float secondaryCooldown, utilityCooldown, specialCooldown, primaryRadius;
 
+        public static bool stridesHeresyAdjustment;
+
         public static ConfigEntry<KeyboardShortcut> honkButton;
 
         public void Awake()
@@ -54,6 +62,7 @@ namespace Potmobile
             scepterPluginLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.DestroyedClone.AncientScepter");
             riskOfOptionsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.rune580.riskofoptions");
             classicItemsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.ThinkInvisible.ClassicItems");
+            rideMeExtendedLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.Mico27.RideMeExtended");
 
             pluginInfo = Info;
             Assets.Init();
@@ -62,23 +71,17 @@ namespace Potmobile
             DamageTypeSetup.Init();
 
             //Potmobile
-            BuildPotmobileBodyObject();
-            Skins.InitSkins(PotmobileContent.PotmobileBodyObject);
-            CreatePotmobileSurvivorDef();
-            SkillSetup.Init();
-            MasterSetup.CreatePotmobileMaster();
+            new PotmobileCore();
 
             //Hauler
-            BuildHaulerBodyObject();
-            Skins.InitSkins(PotmobileContent.HaulerBodyObject); //Has no CharacterModel, likely incompatible with skins.
-            CreateHaulerSurvivorDef();
-            HaulerSkillSetup();
-            MasterSetup.CreateHaulerMaster();
+            new HaulerCore();
 
             FixJumpPad();
             EnemySetup.Init();
 
             FixVehicleForceZoneFriendlyFire();
+
+            new ItemDisplayCore();
 
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
@@ -93,6 +96,7 @@ namespace Potmobile
             haulerImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Hauler)"), 1f, new ConfigDescription("Affects knockback force when colliding with things.")).Value;
             impactFriendlyFireEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire"), false, new ConfigDescription("Colliding with teammates sends them flying.")).Value;
             impactFriendlyFirePotmobileEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire (Vehicles)"), true, new ConfigDescription("Colliding with teammate Potmobiles and Haulers sends them flying.")).Value;
+            stridesHeresyAdjustment = base.Config.Bind(new ConfigDefinition("General", "Strides of Heresy Adjustment"), true, new ConfigDescription("Using Strides of Heresy auto aligns the body.")).Value;
 
             //Place these in General so config is only 1 page.
             EntityStates.MoffeinPotmobile.Boost.Reset.resetVelocity = base.Config.Bind<bool>(new ConfigDefinition("General", "Special Reset Velocity"), false, new ConfigDescription("Reset velocity to 0 when using the Special."));
@@ -198,356 +202,6 @@ namespace Potmobile
             PotmobileContent.PotmobileBodyIndex = BodyCatalog.FindBodyIndex("MoffeinPotmobileBody");
             PotmobileContent.HaulerBodyIndex = BodyCatalog.FindBodyIndex("MoffeinHaulerBody");
             EnemySetup.SetSpawns(); //Run this here after all the custom stages have been loaded.
-        }
-
-        private void BuildPotmobileBodyObject()
-        {
-            if (PotmobileContent.PotmobileBodyObject) return;
-
-            GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileBody", true);
-
-            SpeedController sc = bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
-            sc.minOverlapDamageCoefficient = potmobileMinRamDamage;
-            sc.minOverlapSpeed = potmobileMinDamageSpeed;
-            sc.doubleDamageOverlapSpeed = potmobileDoubleDamageSpeed;
-            sc.ramHitboxSize = new Vector3(6f, 3f, 6f);
-            sc.reverseSpeedCoefficient = potmobileReverseCoefficient;
-
-            bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
-            bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
-            bodyObject.AddComponent<PotmobileNetworkComponent>();   //Used to squash things
-
-            //Fix interactor
-            Interactor interactor = bodyObject.AddComponent<Interactor>();
-            interactor.maxInteractionDistance = 6f;
-
-            InteractionDriver id = bodyObject.AddComponent<InteractionDriver>();
-            id.highlightInteractor = true;
-
-            //Fix Out of Bounds teleport
-            bodyObject.layer = 0;
-
-            CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
-            cb.bodyColor = new Color32(220, 220, 200, 255);
-            cb.name = "MoffeinPotmobileBody";
-            cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
-            cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
-            cb.bodyFlags |= CharacterBody.BodyFlags.ImmuneToExecutes;
-            cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
-            cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texIconPotmobile.png");
-
-            cb.baseNameToken = "MOFFEINPOTMOBILEBODY_NAME";
-            cb.subtitleNameToken = "MOFFEINPOTMOBILEBODY_SUBTITLE";
-            cb.baseMaxHealth = 480f;
-            cb.levelMaxHealth = 144f;
-            cb.baseArmor =  0;
-            cb.levelArmor = 0f;
-            cb.baseRegen = 1f;
-            cb.levelRegen = 0.2f;
-            cb.baseDamage = 12f;
-            cb.levelDamage = 2.4f;
-            cb.sprintingSpeedMultiplier = 1f;
-
-            #region hurtbox
-            HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();
-            for (int i = 0; i < existingHurtboxes.Length; i++)
-            {
-                Destroy(existingHurtboxes[i]);
-            }
-            HurtBoxGroup existingHBG = bodyObject.GetComponentInChildren<HurtBoxGroup>();
-            if (existingHBG) Destroy(existingHBG);
-
-            ModelLocator modelLocator = bodyObject.GetComponent<ModelLocator>();
-            modelLocator.modelTransform.gameObject.layer = LayerIndex.entityPrecise.intVal;
-
-            GameObject hbObject = modelLocator.modelTransform.gameObject;
-            BoxCollider bc = hbObject.AddComponent<BoxCollider>();
-            bc.center = new Vector3(0f, 0f, 0f);
-            bc.size = new Vector3(3.5f, 1f, 4f);
-            HurtBoxGroup goHurtBoxGroup = hbObject.AddComponent<HurtBoxGroup>();
-
-            HurtBox goHurtBox = hbObject.AddComponent<HurtBox>();
-            goHurtBox.isBullseye = true;
-            goHurtBox.isSniperTarget = true;
-            goHurtBox.healthComponent = bodyObject.GetComponent<HealthComponent>();
-            goHurtBox.damageModifier = HurtBox.DamageModifier.Normal;
-            goHurtBox.hurtBoxGroup = goHurtBoxGroup;
-            goHurtBox.indexInGroup = 0;
-
-            HurtBox[] goHurtBoxArray = new HurtBox[]
-            {
-                goHurtBox
-            };
-
-            goHurtBoxGroup.bullseyeCount = 1;
-            goHurtBoxGroup.hurtBoxes = goHurtBoxArray;
-            goHurtBoxGroup.mainHurtBox = goHurtBox;
-
-            //Doesn't work, build hitbox at runtime instead.
-            //Would be simpler if this was done on the prefab in Unity, but that's not an option here.
-            /*GameObject ramHitbox = new GameObject();
-            ramHitbox.transform.parent = bodyObject.transform;
-            ramHitbox.transform.localScale = bc.size * 1.5f;
-            ramHitbox.name = "RamHitbox";
-            SetupHitbox(bodyObject, "RamHitbox", new Transform[] { ramHitbox.transform });*/
-            #endregion
-
-            #region statemachines
-            NetworkStateMachine nsm = bodyObject.GetComponent<NetworkStateMachine>();
-            if (!nsm)
-            {
-                nsm = bodyObject.AddComponent<NetworkStateMachine>();
-                nsm.stateMachines = bodyObject.GetComponents<EntityStateMachine>();
-            }
-
-            EntityStateMachine boostMachine = bodyObject.AddComponent<EntityStateMachine>();
-            boostMachine.customName = "Boost";
-            boostMachine.initialStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
-            boostMachine.mainStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
-            nsm.stateMachines.Append(boostMachine).ToArray();
-            #endregion
-
-            //Fix freeze nullref spam
-            SetStateOnHurt ssoh = bodyObject.AddComponent<SetStateOnHurt>();
-            ssoh.canBeFrozen = true;
-            ssoh.canBeHitStunned = false;
-            ssoh.canBeStunned = false;
-            ssoh.idleStateMachine = new EntityStateMachine[] { EntityStateMachine.FindByCustomName(bodyObject, "Weapon"), boostMachine };
-            ssoh.targetStateMachine = EntityStateMachine.FindByCustomName(bodyObject, "Body");
-
-            //Fix Potmobiles living after death
-            PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.PotmobileDeath));
-            CharacterDeathBehavior cdb = bodyObject.AddComponent<CharacterDeathBehavior>();
-            cdb.deathState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.PotmobileDeath));
-            cdb.deathStateMachine = ssoh.targetStateMachine;
-            cdb.idleStateMachine = ssoh.idleStateMachine;
-
-            VehicleForceZone vfz = bodyObject.GetComponentInChildren<VehicleForceZone>();
-            if (potmobileImpactMult <= 0f)
-            {
-                Destroy(vfz);
-            }
-            else
-            {
-                vfz.impactMultiplier = potmobileImpactMult;
-            }
-
-            HoverVehicleMotor hvm = bodyObject.GetComponent<HoverVehicleMotor>();
-            hvm.motorForce = potmobileForce;
-
-            PotmobileContent.PotmobileBodyObject = bodyObject;
-        }
-        private void CreatePotmobileSurvivorDef()
-        {
-            GameObject displayObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/PotMobile/PotMobileBody.prefab").WaitForCompletion(), "MoffeinPotmobileDisplay", false);
-            displayObject = displayObject.GetComponent<ModelLocator>().modelTransform.gameObject;
-            displayObject.transform.localScale *= 0.5f;
-
-            SurvivorDef sd = ScriptableObject.CreateInstance<SurvivorDef>();
-            sd.cachedName = "MoffeinPotmobile";
-            sd.bodyPrefab = PotmobileContent.PotmobileBodyObject;
-            sd.hidden = false;
-            sd.desiredSortPosition = potSortPosition;
-            sd.descriptionToken = "MOFFEINPOTMOBILEBODY_DESCRIPTION";
-            sd.displayPrefab = displayObject;
-            sd.mainEndingEscapeFailureFlavorToken = "MOFFEINPOTMOBILEBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";
-            sd.outroFlavorToken = "MOFFEINPOTMOBILEBODY_OUTRO_FLAVOR";
-            (sd as ScriptableObject).name = sd.cachedName;
-            PotmobileContent.PotmobileSurvivorDef = sd;
-        }
-
-        private void BuildHaulerBodyObject()
-        {
-            if (PotmobileContent.HaulerBodyObject) return;
-            GameObject bodyObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerBody", true);
-
-            SpeedController sc = bodyObject.AddComponent<SpeedController>(); //Allows it to benefit from move speed
-            sc.minOverlapDamageCoefficient = haulerMinRamDamage;
-            sc.minOverlapSpeed = haulerMinDamageSpeed;
-            sc.doubleDamageOverlapSpeed = haulerDoubleDamageSpeed;
-            sc.reverseSpeedCoefficient = haulerReverseCoefficient;
-            sc.ramHitboxSize = new Vector3(7.7f, 4.2f, 14f);
-
-            bodyObject.AddComponent<EquipmentSlot>();   //Fixes Equipment not working.
-            bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
-            bodyObject.AddComponent<PotmobileNetworkComponent>();   //Used to squash things
-
-            //Fix interactor
-            Interactor interactor = bodyObject.AddComponent<Interactor>();
-            interactor.maxInteractionDistance = 10f;
-
-            InteractionDriver id = bodyObject.AddComponent<InteractionDriver>();
-            id.highlightInteractor = true;
-
-            //Fix Out of Bounds teleport
-            bodyObject.layer = 0;
-
-            ChildLocator childLocator = bodyObject.GetComponentInChildren<ChildLocator>();
-            if (childLocator)
-            {
-                Transform t = childLocator.gameObject.transform;
-                if (t)
-                {
-                    CharacterModel characterModel = t.gameObject.AddComponent<CharacterModel>();
-                    MeshRenderer[] meshRenderers = t.gameObject.GetComponentsInChildren<MeshRenderer>();
-                    if (meshRenderers.Length > 0)
-                    {
-                        List<CharacterModel.RendererInfo> rendererInfos = new List<CharacterModel.RendererInfo>();
-                        foreach (MeshRenderer mesh in meshRenderers)
-                        {
-                            CharacterModel.RendererInfo rendererInfo = new CharacterModel.RendererInfo();
-                            rendererInfo.renderer = mesh;
-                            rendererInfo.defaultMaterial = mesh.material;
-                            rendererInfo.defaultShadowCastingMode = mesh.shadowCastingMode;
-                        }
-                        characterModel.baseRendererInfos = rendererInfos.ToArray();
-                    }
-                }
-            }
-
-            CharacterBody cb = bodyObject.GetComponent<CharacterBody>();
-            cb.bodyColor = new Color32(34, 71, 224, 255);
-            cb.name = "MoffeinHaulerBody";
-            cb.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
-            cb.bodyFlags |= CharacterBody.BodyFlags.Mechanical;
-            cb.bodyFlags |= CharacterBody.BodyFlags.ImmuneToExecutes;
-            cb._defaultCrosshairPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherCrosshair.prefab").WaitForCompletion();
-            cb.portraitIcon = Assets.assetBundle.LoadAsset<Texture2D>("texIconHauler.png");
-
-            cb.baseNameToken = "MOFFEINHAULERBODY_NAME";
-            cb.subtitleNameToken = "MOFFEINHAULERBODY_SUBTITLE";
-            cb.baseMaxHealth = 600f;
-            cb.levelMaxHealth = 180f;
-            cb.baseArmor = 20;
-            cb.levelArmor = 0f;
-            cb.baseRegen = 1f;
-            cb.levelRegen = 0.2f;
-            cb.baseDamage = 12f;
-            cb.levelDamage = 2.4f;
-            cb.sprintingSpeedMultiplier = 1f;
-
-            #region hurtbox
-            HurtBox[] existingHurtboxes = bodyObject.GetComponentsInChildren<HurtBox>();
-            for (int i = 0; i < existingHurtboxes.Length; i++)
-            {
-                Destroy(existingHurtboxes[i]);
-            }
-            HurtBoxGroup existingHBG = bodyObject.GetComponentInChildren<HurtBoxGroup>();
-            if (existingHBG) Destroy(existingHBG);
-
-            ModelLocator modelLocator = bodyObject.GetComponent<ModelLocator>();
-            modelLocator.modelTransform.gameObject.layer = LayerIndex.entityPrecise.intVal;
-
-            GameObject hbObject = modelLocator.modelTransform.gameObject;
-            BoxCollider bc = hbObject.AddComponent<BoxCollider>();
-            bc.center = new Vector3(0f, 1f, 0f);
-            bc.size = new Vector3(5.5f, 3f, 10f);
-            HurtBoxGroup goHurtBoxGroup = hbObject.AddComponent<HurtBoxGroup>();
-
-            HurtBox goHurtBox = hbObject.AddComponent<HurtBox>();
-            goHurtBox.isBullseye = true;
-            goHurtBox.isSniperTarget = true;
-            goHurtBox.healthComponent = bodyObject.GetComponent<HealthComponent>();
-            goHurtBox.damageModifier = HurtBox.DamageModifier.Normal;
-            goHurtBox.hurtBoxGroup = goHurtBoxGroup;
-            goHurtBox.indexInGroup = 0;
-
-            HurtBox[] goHurtBoxArray = new HurtBox[]
-            {
-                goHurtBox
-            };
-
-            goHurtBoxGroup.bullseyeCount = 1;
-            goHurtBoxGroup.hurtBoxes = goHurtBoxArray;
-            goHurtBoxGroup.mainHurtBox = goHurtBox;
-            #endregion
-
-            //Doesn't work, build hitbox at runtime instead.
-            //Would be simpler if this was done on the prefab in Unity, but that's not an option here.
-            /*GameObject ramHitbox = new GameObject();
-            ramHitbox.transform.parent = bodyObject.transform;
-            ramHitbox.transform.localScale = bc.size * 1.5f;
-            ramHitbox.name = "RamHitbox";
-            SetupHitbox(bodyObject, "RamHitbox", new Transform[] { ramHitbox.transform });*/
-
-            #region statemachines
-            NetworkStateMachine nsm = bodyObject.GetComponent<NetworkStateMachine>();
-            if (!nsm)
-            {
-                nsm = bodyObject.AddComponent<NetworkStateMachine>();
-                nsm.stateMachines = bodyObject.GetComponents<EntityStateMachine>();
-            }
-
-            EntityStateMachine weaponMachine = bodyObject.AddComponent<EntityStateMachine>();
-            weaponMachine.customName = "Weapon";
-            weaponMachine.initialStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
-            weaponMachine.mainStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
-            nsm.stateMachines.Append(weaponMachine).ToArray();
-
-            EntityStateMachine boostMachine = bodyObject.AddComponent<EntityStateMachine>();
-            boostMachine.customName = "Boost";
-            boostMachine.initialStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
-            boostMachine.mainStateType = new SerializableEntityStateType(typeof(EntityStates.Idle));
-            nsm.stateMachines.Append(boostMachine).ToArray();
-            #endregion
-
-            //Fix freeze nullref spam
-            SetStateOnHurt ssoh = bodyObject.AddComponent<SetStateOnHurt>();
-            ssoh.canBeFrozen = true;
-            ssoh.canBeHitStunned = false;
-            ssoh.canBeStunned = false;
-            ssoh.idleStateMachine = new EntityStateMachine[] { weaponMachine, boostMachine };
-            ssoh.targetStateMachine = EntityStateMachine.FindByCustomName(bodyObject, "Body");
-
-            //Fix Potmobiles living after death
-            CharacterDeathBehavior cdb = bodyObject.AddComponent<CharacterDeathBehavior>();
-            cdb.deathState = new SerializableEntityStateType(typeof(EntityStates.MoffeinPotmobile.PotmobileDeath));
-            cdb.deathStateMachine = ssoh.targetStateMachine;
-            cdb.idleStateMachine = ssoh.idleStateMachine;
-
-            VehicleForceZone vfz = bodyObject.GetComponentInChildren<VehicleForceZone>();
-            if (haulerImpactMult <= 0f)
-            {
-                Destroy(vfz);
-            }
-            else
-            {
-                vfz.impactMultiplier = haulerImpactMult;
-            }
-
-            HoverVehicleMotor hvm = bodyObject.GetComponent<HoverVehicleMotor>();
-            hvm.motorForce = haulerForce;
-
-            PotmobileContent.HaulerBodyObject = bodyObject;
-        }
-
-        private void CreateHaulerSurvivorDef()
-        {
-            GameObject displayObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerDisplay", false);
-            displayObject = displayObject.GetComponent<ModelLocator>().modelTransform.gameObject;
-            displayObject.transform.localScale *= 0.25f;
-
-            SurvivorDef sd = ScriptableObject.CreateInstance<SurvivorDef>();
-            sd.cachedName = "MoffeinHauler";
-            sd.bodyPrefab = PotmobileContent.HaulerBodyObject;
-            sd.hidden = false;
-            sd.desiredSortPosition = haulSortPosition;
-            sd.descriptionToken = "MOFFEINHAULERBODY_DESCRIPTION";
-            sd.displayPrefab = displayObject;
-            sd.mainEndingEscapeFailureFlavorToken = "MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";
-            sd.outroFlavorToken = "MOFFEINHAULERBODY_OUTRO_FLAVOR";
-            (sd as ScriptableObject).name = sd.cachedName;
-            PotmobileContent.HaulerSurvivorDef = sd;
-        }
-
-        private void HaulerSkillSetup()
-        {
-            SkillLocator skillLocator = PotmobileContent.HaulerBodyObject.GetComponent<SkillLocator>();
-            SkillSetup.CreateSkillFamilies(PotmobileContent.HaulerBodyObject, true);
-            SkillSetup.AddSkillToFamily(skillLocator.primary.skillFamily, PotmobileContent.SkillDefs.FirePotCannon);
-            SkillSetup.AddSkillToFamily(skillLocator.secondary.skillFamily, PotmobileContent.SkillDefs.Push);
-            SkillSetup.AddSkillToFamily(skillLocator.utility.skillFamily, PotmobileContent.SkillDefs.Boost);
-            SkillSetup.AddSkillToFamily(skillLocator.special.skillFamily, PotmobileContent.SkillDefs.Reset);
         }
 
         private void FixJumpPad()

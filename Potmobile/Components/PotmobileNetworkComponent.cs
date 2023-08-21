@@ -22,7 +22,7 @@ namespace Potmobile.Components
             {
                 if (honkCooldownStopwatch <= 0f)
                 {
-                    if (Potmobile.GetKeyPressed(Potmobile.honkButton))
+                    if (PotmobilePlugin.GetKeyPressed(PotmobilePlugin.honkButton))
                     {
                         if (!wasPressed)
                         {

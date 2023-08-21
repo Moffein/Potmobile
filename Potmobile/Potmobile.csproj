@@ -96,6 +96,9 @@
     <Reference Include="Rewired_CSharp">
       <HintPath>libs\Rewired_CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="RideMeExtended">
+      <HintPath>libs\SoftDependencies\RideMeExtended.dll</HintPath>
+    </Reference>
     <Reference Include="RiskOfOptions">
       <HintPath>libs\SoftDependencies\RiskOfOptions.dll</HintPath>
     </Reference>

@@ -1,0 +1,66 @@
+ManifestFileVersion: 0
+CRC: 1166623843
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 38fbb2c79f3b1fc05fdb09288e4a3eb6
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 1fe3abd029edb3522ae5dbbc711d0a74
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Resources/Iroha/CH0156_Hair_Mask.png
+- Assets/Resources/Iroha/CH0156_Hair_Spec.png
+- Assets/Resources/Iroha/CH0156_Body.png
+- Assets/Resources/Iroha/CH0156_Tank_02.png
+- Assets/Resources/texIconJeep.png
+- Assets/Resources/texIconPrimaryScepter.png
+- Assets/Resources/tankgirl.fbx
+- Assets/Resources/Iroha/CH0156_EyeMouth.png
+- Assets/Resources/texIconPotmobile.png
+- Assets/Resources/Iroha/CH0156_Tank_01.png
+- Assets/Resources/Iroha/CH0156_Body_Mask.png
+- Assets/Resources/Iroha/tankMat.mat
+- Assets/Resources/mdlHaulerJeep.prefab
+- Assets/Resources/Iroha/CH0156_Weapon_Mask.png
+- Assets/Resources/Iroha/CH0156_Weapon.png
+- Assets/Resources/Iroha/CH0156_Book_Mask.png
+- Assets/Resources/Iroha/faceMat.mat
+- Assets/Resources/Iroha/CH0156_Hair2.png
+- Assets/Resources/Iroha/hairMat.mat
+- Assets/Resources/Iroha/CH0156_Tank_01_Mask.png
+- Assets/Resources/texIconHauler.png
+- Assets/Resources/mdlHaulerJeep.fbx
+- Assets/Resources/Iroha/CH0156_Hair.png
+- Assets/Resources/TankGirlPrefab.prefab
+- Assets/Resources/Iroha/CH0156_Tank_02_Mask.png
+- Assets/Resources/HaulerMesh.obj
+- Assets/Resources/Iroha/CH0156_Body2.png
+- Assets/Resources/Iroha/CH0156_Face.png
+- Assets/Resources/Iroha/bodyMat.mat
+- Assets/Resources/Iroha/CH0156_Halo.png
+- Assets/Resources/Iroha/haloMat.mat
+- Assets/Resources/Iroha/CH0156_Book.png
+- Assets/Resources/Iroha/eyeMouthMat.mat
+- Assets/Resources/Iroha/tankWheelMat.mat
+Dependencies: []

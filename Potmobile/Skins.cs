@@ -10,44 +10,6 @@ namespace Potmobile
     //Based off of HenryMod code.
     public class Skins
     {
-
-        public static void InitSkins(GameObject bodyPrefab)
-        {
-            if (!bodyPrefab) return;
-
-            GameObject model = bodyPrefab.GetComponentInChildren<ModelLocator>().modelTransform.gameObject;
-            CharacterModel characterModel = model.GetComponent<CharacterModel>();
-
-            ModelSkinController skinController = model.GetComponent<ModelSkinController>();
-            if (!skinController) skinController = model.AddComponent<ModelSkinController>();
-
-            ChildLocator childLocator = model.GetComponent<ChildLocator>();
-
-            SkinnedMeshRenderer mainRenderer = null;
-            CharacterModel.RendererInfo[] defaultRenderers = null;
-            if (characterModel)
-            {
-                mainRenderer = characterModel.mainSkinnedMeshRenderer;
-                defaultRenderers = characterModel.baseRendererInfos;
-            }
-
-            List<SkinDef> skins = new List<SkinDef>();
-
-            #region DefaultSkin
-            SkinDef defaultSkin = CreateSkinDef("DEFAULT_SKIN",
-                (bodyPrefab == PotmobileContent.HaulerBodyObject ? Assets.assetBundle.LoadAsset<Sprite>("texIconHauler.png") : Assets.assetBundle.LoadAsset<Sprite>("texIconPotmobile.png")),
-                defaultRenderers,
-                mainRenderer,
-                model);
-
-            defaultSkin.meshReplacements = new SkinDef.MeshReplacement[] { };
-
-            skins.Add(defaultSkin);
-            #endregion
-
-            skinController.skins = skins.ToArray();
-        }
-
         public static SkinDef CreateSkinDef(string skinName, Sprite skinIcon, CharacterModel.RendererInfo[] rendererInfos, SkinnedMeshRenderer mainRenderer, GameObject root)
         {
             return CreateSkinDef(skinName, skinIcon, rendererInfos, mainRenderer, root, null);
