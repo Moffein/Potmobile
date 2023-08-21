@@ -19,17 +19,8 @@ namespace Potmobile
         public static void Init()
         {
             if (assetBundle) return;
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Potmobile.potmobilebundle"))
-            {
-                assetBundle = AssetBundle.LoadFromStream(stream);
-            }
 
-            using (var bankStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Potmobile.MoffeinPotmobileSoundbank.bnk"))
-            {
-                var bytes = new byte[bankStream.Length];
-                bankStream.Read(bytes, 0, bytes.Length);
-                R2API.SoundAPI.SoundBanks.Add(bytes);
-            }
+            assetBundle = AssetBundle.LoadFromFile(Files.GetPathToFile("potmobilebundle"));
         }
     }
 }

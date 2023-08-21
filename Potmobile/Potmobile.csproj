@@ -5,16 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="MoffeinPotmobileSoundbank.bnk" />
-    <None Remove="potmobilebundle" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="MoffeinPotmobileSoundbank.bnk" />
-    <EmbeddedResource Include="potmobilebundle" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>libs\BepInEx\0Harmony.dll</HintPath>
     </Reference>

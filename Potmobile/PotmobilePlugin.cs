@@ -59,6 +59,8 @@ namespace Potmobile
 
         public void Awake()
         {
+            Files.PluginInfo = this.Info;
+
             scepterPluginLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.DestroyedClone.AncientScepter");
             riskOfOptionsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.rune580.riskofoptions");
             classicItemsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.ThinkInvisible.ClassicItems");
@@ -85,6 +87,11 @@ namespace Potmobile
 
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
+        }
+
+        public void Start()
+        {
+            SoundBanks.Init();
         }
 
         private void ReadConfig()
