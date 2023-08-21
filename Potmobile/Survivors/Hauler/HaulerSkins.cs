@@ -17,17 +17,26 @@ namespace Potmobile.Survivors.Hauler
         public static Dictionary<string, GameObject> skinGOSelection = new Dictionary<string, GameObject>();
         public static Dictionary<string, SkinDef> skinIdentifiers = new Dictionary<string, SkinDef>();
 
-        public static GameObject AutoAddGameObjectActivations(SkinDef skinDef, string identifier, GameObject originalPrefab, bool shouldCopy = true)
+        public static Transform mdlHaulerTransform
         {
-            var mdlHaulerTransform = PotmobileContent.HaulerBodyObject.transform.Find("Model Base/mdlHauler");
+            get
+            {
+                return PotmobileContent.HaulerBodyObject.transform.Find("Model Base/mdlHauler");
+            }
+        }
 
-            GameObject copyPrefab = shouldCopy ?
-                UnityEngine.Object.Instantiate(originalPrefab) : originalPrefab;
-            copyPrefab.transform.SetParent(mdlHaulerTransform);
-            copyPrefab.transform.localPosition = Vector3.zero;
-            copyPrefab.SetActive(!shouldCopy);
+        public static GameObject ParentToHauler(GameObject gameObject, bool copy, Vector3 localScale, Vector3 localPosition)
+        {
+            if (copy) gameObject = UnityEngine.Object.Instantiate(gameObject);
+            gameObject.transform.SetParent(mdlHaulerTransform);
+            gameObject.transform.localScale = localScale;
+            gameObject.transform.localPosition = localPosition;
+            return gameObject;
+        }
 
-            skinGOSelection[identifier] = copyPrefab;
+        public static void AutoAddGameObjectActivations(SkinDef skinDef, string identifier, GameObject skinGameObject)
+        {
+            skinGOSelection[identifier] = skinGameObject;
             skinIdentifiers[identifier] = skinDef;
             skins.Add(skinDef);
 
@@ -53,7 +62,6 @@ namespace Potmobile.Survivors.Hauler
             GameObject model = PotmobileContent.HaulerBodyObject.GetComponentInChildren<ModelLocator>().modelTransform.gameObject;
             ModelSkinController skinController = model.GetComponent<ModelSkinController>();
             skinController.skins = skins.ToArray();
-            return copyPrefab;
         }
 
         public static void InitSkins()
@@ -82,8 +90,8 @@ namespace Potmobile.Survivors.Hauler
                 defaultRenderers,
                 mainRenderer,
                 model);
-
-            AutoAddGameObjectActivations(defaultSkin, "Hauler", PotmobileContent.HaulerBodyObject.transform.Find("Model Base/mdlHauler/HaulerMesh").gameObject, false);
+            var skinGO = PotmobileContent.HaulerBodyObject.transform.Find("Model Base/mdlHauler/HaulerMesh").gameObject;
+            AutoAddGameObjectActivations(defaultSkin, "Hauler", skinGO);
             MeshRenderer haulerMR = skinGOSelection["Hauler"].GetComponent<MeshRenderer>();
             var haulerRendererInfo = new CharacterModel.RendererInfo()
             {
@@ -104,7 +112,8 @@ namespace Potmobile.Survivors.Hauler
                 model);
             //body + wheels
 
-            var haulerJeepGO = AutoAddGameObjectActivations(jeepSkinDef, "HaulerJeep", Assets.assetBundle.LoadAsset<GameObject>("mdlHaulerJeep.prefab"));
+            var haulerJeepGO = ParentToHauler(Assets.assetBundle.LoadAsset<GameObject>("mdlHaulerJeep.prefab"), true, Vector3.one, Vector3.zero);
+            AutoAddGameObjectActivations(jeepSkinDef, "HaulerJeep", haulerJeepGO);
             var jeepMeshMR = haulerJeepGO.GetComponent<MeshRenderer>();
             var jeepRendererInfo = new CharacterModel.RendererInfo()
             {

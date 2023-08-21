@@ -30,6 +30,30 @@ namespace Potmobile.Survivors.Hauler
             MasterSetup.CreateHaulerMaster();
 
             RoR2.ContentManagement.ContentManager.onContentPacksAssigned += ContentManager_onContentPacksAssigned;
+
+            if (PotmobilePlugin.stridesHeresyAdjustment)
+                On.EntityStates.GhostUtilitySkillState.FixedUpdate += GhostUtilitySkillState_FixedUpdate;
+            On.RoR2.SkinCatalog.Init += SkinCatalog_Init;
+        }
+
+        private void SkinCatalog_Init(On.RoR2.SkinCatalog.orig_Init orig)
+        {
+            orig();
+            CreateHaulerDisplayObject();
+        }
+
+        private void GhostUtilitySkillState_FixedUpdate(On.EntityStates.GhostUtilitySkillState.orig_FixedUpdate orig, GhostUtilitySkillState self)
+        {
+            orig(self);
+            if (self.isAuthority)
+            {
+                if (self.transform)
+                {
+                    Ray aimRay = self.GetAimRay();
+                    self.transform.forward = aimRay.direction;
+                    self.transform.eulerAngles = new Vector3(0f, self.transform.eulerAngles.y, 0f);
+                }
+            }
         }
 
         private void ContentManager_onContentPacksAssigned(HG.ReadOnlyArray<RoR2.ContentManagement.ReadOnlyContentPack> obj)
@@ -185,13 +209,13 @@ namespace Potmobile.Survivors.Hauler
             //
             // ☆*: .｡. o(≧▽≦)o .｡.:*☆
             //
-            var jeepPrefab = UnityEngine.Object.Instantiate(Assets.assetBundle.LoadAsset<GameObject>("mdlHaulerJeep.prefab"), mdlHaulerTransform);
+            /*var jeepPrefab = UnityEngine.Object.Instantiate(Assets.assetBundle.LoadAsset<GameObject>("mdlHaulerJeep.prefab"), mdlHaulerTransform);
             jeepPrefab.transform.localPosition = Vector3.zero;
             jeepPrefab.SetActive(false);
 
             var irohaPrefab = UnityEngine.Object.Instantiate(Assets.assetBundle.LoadAsset<GameObject>("TankGirlPrefab.prefab"), mdlHaulerTransform);
             irohaPrefab.transform.localPosition = Vector3.zero;
-            irohaPrefab.SetActive(false);
+            irohaPrefab.SetActive(false);*/
 
             //ModelPanelParameters modelPanelParameters = mdlHaulerTransform.gameObject.AddComponent<ModelPanelParameters>();
             //needs to be configured. or else it throws something
@@ -353,12 +377,12 @@ namespace Potmobile.Survivors.Hauler
             PotmobileContent.HaulerBodyObject = bodyObject;
         }
 
-        private void CreateHaulerSurvivorDef()
+        public static void CreateHaulerDisplayObject()
         {
             //GameObject displayObject = PrefabAPI.InstantiateClone(Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/Hauler/HaulerBody.prefab").WaitForCompletion(), "MoffeinHaulerDisplay", false);
             //displayObject = displayObject.GetComponent<ModelLocator>().modelTransform.gameObject;
             //displayObject.transform.localScale *= 0.25f;
-            GameObject displayObject = PrefabAPI.InstantiateClone(PotmobileContent.HaulerBodyObject.transform.Find("Model Base").gameObject, "MoffeinHaulerDisplay");
+            GameObject displayObject = PrefabAPI.InstantiateClone(PotmobileContent.HaulerBodyObject.transform.Find("Model Base").gameObject, "MoffeinHaulerDisplay", false);
             displayObject.transform.localScale *= 0.25f;
             var mdlHauler = displayObject.transform.Find("mdlHauler");
             mdlHauler.transform.localPosition = Vector3.up;
@@ -366,15 +390,18 @@ namespace Potmobile.Survivors.Hauler
             mdlHauler.GetComponent<HurtBox>().enabled = false;
             //mdlHauler.transform.Find("Front.L").GetComponent<HoverEngine>().enabled = false;
             mdlHauler.transform.Find("ForceBox").gameObject.SetActive(false);
+            PotmobileContent.HaulerSurvivorDef.displayPrefab = displayObject;
+        }
 
-
+        private void CreateHaulerSurvivorDef()
+        {
             SurvivorDef sd = ScriptableObject.CreateInstance<SurvivorDef>();
             sd.cachedName = "MoffeinHauler";
             sd.bodyPrefab = PotmobileContent.HaulerBodyObject;
             sd.hidden = false;
             sd.desiredSortPosition = haulSortPosition;
             sd.descriptionToken = "MOFFEINHAULERBODY_DESCRIPTION";
-            sd.displayPrefab = displayObject;
+            sd.displayPrefab = null;
             sd.mainEndingEscapeFailureFlavorToken = "MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR";
             sd.outroFlavorToken = "MOFFEINHAULERBODY_OUTRO_FLAVOR";
             (sd as ScriptableObject).name = sd.cachedName;

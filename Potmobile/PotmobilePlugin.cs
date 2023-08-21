@@ -22,7 +22,7 @@ namespace Potmobile
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.Mico27.RideMeExtended", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.3.3")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.4.0")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2API.Utils.R2APISubmoduleDependency(nameof(RecalculateStatsAPI), nameof(PrefabAPI), nameof(DamageAPI), nameof(SoundAPI), nameof(LoadoutAPI), nameof(DirectorAPI))]
     public class PotmobilePlugin : BaseUnityPlugin
@@ -52,6 +52,8 @@ namespace Potmobile
 
         public static int secondaryStocks, utilityStocks, specialStocks;
         public static float secondaryCooldown, utilityCooldown, specialCooldown, primaryRadius;
+
+        public static bool stridesHeresyAdjustment;
 
         public static ConfigEntry<KeyboardShortcut> honkButton;
 
@@ -94,6 +96,7 @@ namespace Potmobile
             haulerImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Hauler)"), 1f, new ConfigDescription("Affects knockback force when colliding with things.")).Value;
             impactFriendlyFireEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire"), false, new ConfigDescription("Colliding with teammates sends them flying.")).Value;
             impactFriendlyFirePotmobileEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire (Vehicles)"), true, new ConfigDescription("Colliding with teammate Potmobiles and Haulers sends them flying.")).Value;
+            stridesHeresyAdjustment = base.Config.Bind(new ConfigDefinition("General", "Strides of Heresy Adjustment"), true, new ConfigDescription("Using Strides of Heresy auto aligns the body.")).Value;
 
             //Place these in General so config is only 1 page.
             EntityStates.MoffeinPotmobile.Boost.Reset.resetVelocity = base.Config.Bind<bool>(new ConfigDefinition("General", "Special Reset Velocity"), false, new ConfigDescription("Reset velocity to 0 when using the Special."));
