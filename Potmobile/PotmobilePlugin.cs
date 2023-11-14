@@ -110,7 +110,7 @@ namespace Potmobile
 
             potSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Potmobile)"), 9999f, new ConfigDescription("Position of Potmobile in the Survivor Select menu.")).Value;
             haulSortPosition = base.Config.Bind<float>(new ConfigDefinition("Survivor", "Sort Position (Hauler)"), 10000f, new ConfigDescription("Position of Hauler in the Survivor Select menu.")).Value;
-            GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), false, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
+            GiveItemsOnSpawn.giveVase = base.Config.Bind<bool>(new ConfigDefinition("Survivor", "Start with Vase"), true, new ConfigDescription("Gives an Eccentric Vase if your equipment slot is empty so that you can skip platforming sections.")).Value;
 
             ramEnabled = base.Config.Bind<bool>(new ConfigDefinition("Ramming", "Enabled"),true, new ConfigDescription("Ramming enemies deals damage.")).Value;
             ramDisableOnEnemies = base.Config.Bind<bool>(new ConfigDefinition("Ramming", "Disable on Enemies"), true, new ConfigDescription("Enemy Potmobiles and Haulers dont deal ram damage.")).Value;
