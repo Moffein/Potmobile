@@ -344,4 +344,8 @@
     <Resource Include="MoffeinPotmobileSoundbank.bnk" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call &quot;$(ProjectDir)postbuild.bat&quot;&#xD;&#xA;" />
+  </Target>
+
 </Project>

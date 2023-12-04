@@ -41,11 +41,9 @@ namespace Potmobile.Components
             graceTimer = baseGraceTimer;
 
             health = base.GetComponent<HealthComponent>();
-            if (!health)
-            {
-                Destroy(this);
-            }
-            model = base.GetComponent<CharacterBody>().modelLocator.modelTransform.gameObject;
+            CharacterBody body = base.GetComponent<CharacterBody>();
+            if (body.modelLocator && body.modelLocator.modelTransform) model = body.modelLocator.modelTransform.gameObject;
+            if (!health || !body || !model) Destroy(this);
         }
 
         public void FixedUpdate()
