@@ -1,0 +1,13 @@
+{
+	strings:
+	{
+		"MOFFEINHAULERBODY_NAME" : "搬运工",
+		"MOFFEINHAULERBODY_DESCRIPTION" : "搬运工是一个缓慢但强壮的打手，可以凭借其良好的物理性能来独特地探索环境。<style=cSub>\r\n\r\n< ! >锅盖射击可以造成伤害。\r\n\r\n< ! >任何情况下都不应该使用震荡弹跳来恶作剧！！！！\r\n\r\n< ! >氮气冲刺是十分有用的技能，在非冷却期间持续激活它。\r\n\r\n< ! > 重置总是能救你一命。</style>\r\n",
+		"MOFFEINHAULERBODY_LORE" : "轰轰",
+		"MOFFEINHAULERBODY_SUBTITLE" : "搬运工",
+		"MOFFEINHAULERBODY_OUTRO_FLAVOR" : "..于是它离开了，被一艘宇宙飞船拖走了。",
+		"MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR" : "..于是它消失了，。",
+		
+		"MOFFEINHAULERBODY_SKIN_GEEP_NAME" : "基普",
+	}
+}
