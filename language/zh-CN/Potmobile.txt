@@ -1,0 +1,27 @@
+{
+	strings:
+	{
+		"MOFFEINPOTMOBILEBODY_NAME" : "锅盖车",
+		"MOFFEINPOTMOBILEBODY_DESCRIPTION" :"锅盖车是一个缓慢但强壮的打手，可以凭借其良好的物理性能来独特地探索环境。<style=cSub>\r\n\r\n< ! >锅盖射击可以造成伤害。\r\n\r\n< ! >任何情况下都不应该使用震荡弹跳来恶作剧！！！！\r\n\r\n< ! >氮气冲刺是十分有用的技能，在非冷却期间持续激活它。\r\n\r\n< ! > 重置总是能救你一命。</style>\r\n",
+		"MOFFEINPOTMOBILEBODY_LORE" : "轰轰",
+		"MOFFEINPOTMOBILEBODY_SUBTITLE" : "锅盖车",
+		"MOFFEINPOTMOBILEBODY_OUTRO_FLAVOR" : "..于是它离开了，滚向远方。",
+		"MOFFEINPOTMOBILEBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR" : "..于是它消失了，永远倒悬。",
+		
+		"MOFFEINPOTMOBILEBODY_PRIMARY_NAME" : "锅盖射击",
+		"MOFFEINPOTMOBILEBODY_PRIMARY_DESCRIPTION" : "发射一个炸药罐，造成<style=cIsDamage>1000%伤害</style>。",
+		
+		"MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_NAME" : "巨大锅盖射击",
+		"MOFFEINPOTMOBILEBODY_PRIMARY_SCEPTER_DESCRIPTION" : "发射一个炸药罐，造成<style=cIsDamage>2000%伤害</style>。",
+		
+		"MOFFEINPOTMOBILEBODY_SECONDARY_NAME" : "震荡弹射",
+		"MOFFEINPOTMOBILEBODY_SECONDARY_DESCRIPTION" : "<style=cIsUtility>向上弹跳</style>并<style=cIsUtility>推开</style>附近的敌人。",
+		
+		"MOFFEINPOTMOBILEBODY_UTILITY_NAME" : "氮气冲刺",
+		"MOFFEINPOTMOBILEBODY_UTILITY_DESCRIPTION" : "向前快速移动并提升<style=cIsUtility>200%移速</style>。",
+		
+		"MOFFEINPOTMOBILEBODY_SPECIAL_NAME" : "重置",
+		"MOFFEINPOTMOBILEBODY_SPECIAL_DESCRIPTION" : "<style=cIsUtility>重置车身状态</style>.",
+		
+	}
+}
