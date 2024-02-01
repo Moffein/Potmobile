@@ -53,6 +53,11 @@ namespace Potmobile.Survivors.Potmobile
             bodyObject.AddComponent<GiveItemsOnSpawn>();   //Prevents AI Potmobiles from spawning in the ground and instantly dying
             bodyObject.AddComponent<PotmobileNetworkComponent>();   //Used to squash things
 
+            DeathRewards dr = bodyObject.GetComponent<DeathRewards>();
+            if (!dr) dr = bodyObject.AddComponent<DeathRewards>();
+            dr.logUnlockableDef = null;
+            dr.bossPickup = new SerializablePickupIndex { pickupName = "" };
+
             //Fix interactor
             Interactor interactor = bodyObject.AddComponent<Interactor>();
             interactor.maxInteractionDistance = 6f;

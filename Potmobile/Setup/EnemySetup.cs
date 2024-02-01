@@ -39,7 +39,7 @@ namespace Potmobile
                     {
                         float levelBonus = sender.level - 1f;
                         args.baseRegenAdd -= sender.baseRegen + sender.levelRegen * levelBonus;
-                        args.baseDamageAdd -= 0.7f * (sender.baseDamage + sender.levelDamage * levelBonus);
+                        args.baseDamageAdd -= 0.8f * (sender.baseDamage + sender.levelDamage * levelBonus);
                     }
                 }
             };
