@@ -189,6 +189,9 @@ namespace Potmobile.Components
 
                 overlapAttack.damage = damageCoefficient * minOverlapDamageCoefficient * (body ? body.damage : 1f);
 
+                bool shouldReduceDamage = !body || (body && EnemySetup.ShouldApplyEnemyDebuff(body));
+                if (shouldReduceDamage) overlapAttack.damage *= 0.1f;
+
                 hitEnemy = overlapAttack.Fire();
             }
             if (hitEnemy)

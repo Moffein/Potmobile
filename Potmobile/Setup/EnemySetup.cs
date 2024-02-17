@@ -29,6 +29,31 @@ namespace Potmobile
             NerfEnemy();
         }
 
+        public static bool ShouldApplyEnemyDebuff(CharacterBody cb)
+        {
+            if (!cb.isPlayerControlled) return false;
+
+            bool isPotmobile = cb.bodyIndex == PotmobileContent.PotmobileBodyIndex && nerfPotmobile;
+            bool isHauler = cb.bodyIndex == PotmobileContent.HaulerBodyIndex && nerfHauler;
+            if (!isPotmobile && !isHauler) return false;
+
+            bool isPlayerTeam = cb.teamComponent && cb.teamComponent.teamIndex == TeamIndex.Player;
+            bool hasChirrBuff = CheckChirrBuff(cb);
+            if (isPlayerTeam && !hasChirrBuff) return false;
+
+            return true;
+        }
+
+
+        private static bool CheckChirrBuff(CharacterBody cb)
+        {
+            BuffIndex ss2uChirr = BuffCatalog.FindBuffIndex("SS2UChirrFriendBuff");
+            if (ss2uChirr != BuffIndex.None && cb.HasBuff(ss2uChirr)) return true;
+
+            BuffIndex ss2oChirr = BuffCatalog.FindBuffIndex("BuffChirrFriend");
+            return (ss2oChirr != BuffIndex.None && cb.HasBuff(ss2oChirr));
+        }
+
         private static void NerfEnemy()
         {
             RecalculateStatsAPI.GetStatCoefficients += (sender, args) =>

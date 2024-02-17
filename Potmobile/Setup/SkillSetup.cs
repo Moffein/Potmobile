@@ -28,6 +28,25 @@ namespace Potmobile
             BuildSpecial(skillLocator);
         }
 
+        private static GameObject BuildPrimaryProjectile(string name, float damageMult, float radius, bool useFalloff)
+        {
+            GameObject projectilePrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherProjectile.prefab").WaitForCompletion().InstantiateClone(name, true);
+            ProjectileImpactExplosion pie = projectilePrefab.GetComponent<ProjectileImpactExplosion>();
+            pie.blastRadius = radius;
+            pie.falloffModel = useFalloff ? BlastAttack.FalloffModel.SweetSpot : BlastAttack.FalloffModel.None;
+            pie.bonusBlastForce = Vector3.zero;
+            pie.blastDamageCoefficient = damageMult;
+
+            ProjectileController pc = projectilePrefab.GetComponent<ProjectileController>();
+            pc.ghostPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayPotProjectileGhost.prefab").WaitForCompletion();
+
+            ProjectileDamage pd = projectilePrefab.GetComponent<ProjectileDamage>();
+            pd.damageType = DamageType.ClayGoo;
+
+            PotmobileContent.projectilePrefabs.Add(projectilePrefab);
+            return projectilePrefab;
+        }
+
 
         private static void BuildPrimary(SkillLocator skillLocator)
         {
@@ -58,20 +77,8 @@ namespace Potmobile
             AddSkillToFamily(skillLocator.primary.skillFamily, primaryDef);
             PotmobileContent.SkillDefs.FirePotCannon = primaryDef;
 
-            GameObject projectilePrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherProjectile.prefab").WaitForCompletion().InstantiateClone("MoffeinPotmobileRocket", true);
-            ProjectileImpactExplosion pie = projectilePrefab.GetComponent<ProjectileImpactExplosion>();
-            pie.blastRadius = PotmobilePlugin.primaryRadius;
-            pie.falloffModel = BlastAttack.FalloffModel.None;
-            pie.bonusBlastForce = Vector3.zero;
-
-            ProjectileController pc = projectilePrefab.GetComponent<ProjectileController>();
-            pc.ghostPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayPotProjectileGhost.prefab").WaitForCompletion();
-
-            ProjectileDamage pd = projectilePrefab.GetComponent<ProjectileDamage>();
-            pd.damageType = DamageType.ClayGoo;
-
-            PotmobileContent.projectilePrefabs.Add(projectilePrefab);
-            EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.projectilePrefab = projectilePrefab;
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.projectilePrefab = BuildPrimaryProjectile("MoffeinPotmobileRocket", 1f, PotmobilePlugin.primaryRadius, false);
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannon.projectilePrefabEnemy = BuildPrimaryProjectile("MoffeinPotmobileRocketEnemy", 0.1f, PotmobilePlugin.primaryRadius, true);
         }
 
         private static void BuildPrimaryScepter()
@@ -101,20 +108,9 @@ namespace Potmobile
             PotmobileContent.entityStates.Add(typeof(EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter));
             PotmobileContent.SkillDefs.FirePotCannonScepter = primaryScepterDef;
 
-            GameObject projectilePrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Toolbot/ToolbotGrenadeLauncherProjectile.prefab").WaitForCompletion().InstantiateClone("MoffeinPotmobileRocketScepter", true);
-            ProjectileImpactExplosion pie = projectilePrefab.GetComponent<ProjectileImpactExplosion>();
-            pie.blastRadius = PotmobilePlugin.primaryRadius * 2f;
-            pie.falloffModel = BlastAttack.FalloffModel.None;
-            pie.bonusBlastForce = Vector3.zero;
 
-            ProjectileController pc = projectilePrefab.GetComponent<ProjectileController>();
-            pc.ghostPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayPotProjectileGhost.prefab").WaitForCompletion();
-
-            ProjectileDamage pd = projectilePrefab.GetComponent<ProjectileDamage>();
-            pd.damageType = DamageType.ClayGoo;
-
-            PotmobileContent.projectilePrefabs.Add(projectilePrefab);
-            EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter.scepterProjectilePrefab = projectilePrefab;
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter.scepterProjectilePrefab = BuildPrimaryProjectile("MoffeinPotmobileRocketScepter", 1f, PotmobilePlugin.primaryRadius * 2f, false);
+            EntityStates.MoffeinPotmobile.Weapon.FirePotCannonScepter.scepterProjectilePrefabEnemy = BuildPrimaryProjectile("MoffeinPotmobileRocketEnemyScepter", 0.1f, PotmobilePlugin.primaryRadius * 2f, true);
 
             if (PotmobilePlugin.scepterPluginLoaded) AssignScepter();
             if (PotmobilePlugin.classicItemsLoaded) AssignScepterClassic();

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using RoR2;
 using RoR2.Projectile;
+using Potmobile;
 
 namespace EntityStates.MoffeinPotmobile.Weapon
 {
@@ -24,6 +25,7 @@ namespace EntityStates.MoffeinPotmobile.Weapon
                     icbmCount = base.characterBody.inventory.GetItemCount(DLC1Content.Items.MoreMissile);
                 }
 
+                GameObject proj = GetProjectilePrefab();
                 if (enableICBMSynergy && icbmCount > 0)
                 {
                     float damageMult = 1f;
@@ -45,21 +47,15 @@ namespace EntityStates.MoffeinPotmobile.Weapon
                     Ray aimRay2 = new Ray(aimRay.origin, direction);
                     for (int i = 0; i < 3; i++)
                     {
-                        ProjectileManager.instance.FireProjectile(_projectilePrefabInternal, aimRay2.origin, Util.QuaternionSafeLookRotation(aimRay2.direction), base.gameObject, damageMult * this.damageStat * _damageCoefficientInternal, (i != 1 ? 0f : force), isCrit, DamageColorIndex.Default, null, -1f);
+                        ProjectileManager.instance.FireProjectile(proj, aimRay2.origin, Util.QuaternionSafeLookRotation(aimRay2.direction), base.gameObject, damageMult * this.damageStat * _damageCoefficientInternal, (i != 1 ? 0f : force), isCrit, DamageColorIndex.Default, null, -1f);
                         aimRay2.direction = rotation * aimRay2.direction;
                     }
                 }
                 else
                 {
-                    ProjectileManager.instance.FireProjectile(_projectilePrefabInternal, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageStat * _damageCoefficientInternal, 0f, base.RollCrit(), DamageColorIndex.Default, null, -1f);
+                    ProjectileManager.instance.FireProjectile(proj, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageStat * _damageCoefficientInternal, 0f, base.RollCrit(), DamageColorIndex.Default, null, -1f);
                 }
             }
-        }
-
-        public virtual void ModifyStats()
-        {
-            _damageCoefficientInternal = damageCoefficient;
-            _projectilePrefabInternal = projectilePrefab;
         }
 
         public override void FixedUpdate()
@@ -72,16 +68,26 @@ namespace EntityStates.MoffeinPotmobile.Weapon
             }
         }
 
+        public virtual void ModifyStats()
+        {
+            _damageCoefficientInternal = damageCoefficient;
+        }
+
+        public virtual GameObject GetProjectilePrefab()
+        {
+            return EnemySetup.ShouldApplyEnemyDebuff(base.characterBody) ? FirePotCannon.projectilePrefabEnemy : FirePotCannon.projectilePrefab;
+        }
+
         public override InterruptPriority GetMinimumInterruptPriority()
         {
             return InterruptPriority.Skill;
         }
 
         protected float _damageCoefficientInternal;
-        protected GameObject _projectilePrefabInternal;
 
         public static bool enableICBMSynergy = true;
         public static GameObject projectilePrefab;
+        public static GameObject projectilePrefabEnemy;
         public static float damageCoefficient = 10f;
         public static float force = 2500f;
         public static float baseDuration = 1.5f;
