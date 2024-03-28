@@ -102,7 +102,7 @@ namespace Potmobile
             potmobileImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Potmobile)"), 1f, new ConfigDescription("Affects knockback force when colliding with things.")).Value;
             haulerImpactMult = base.Config.Bind<float>(new ConfigDefinition("General", "Impact Force Multiplier (Hauler)"), 1f, new ConfigDescription("Affects knockback force when colliding with things.")).Value;
             impactFriendlyFireEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire"), false, new ConfigDescription("Colliding with teammates sends them flying.")).Value;
-            impactFriendlyFirePotmobileEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire (Vehicles)"), true, new ConfigDescription("Colliding with teammate Potmobiles and Haulers sends them flying.")).Value;
+            impactFriendlyFirePotmobileEnabled = base.Config.Bind<bool>(new ConfigDefinition("General", "Impact Friendly Fire (Vehicles)"), false, new ConfigDescription("Colliding with teammate Potmobiles and Haulers sends them flying.")).Value;
             stridesHeresyAdjustment = base.Config.Bind(new ConfigDefinition("General", "Strides of Heresy Adjustment"), true, new ConfigDescription("Using Strides of Heresy auto aligns the body.")).Value;
 
             //Place these in General so config is only 1 page.

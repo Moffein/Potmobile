@@ -6,7 +6,7 @@
 		"MOFFEINHAULERBODY_LORE" : "Vroom Vroom",
 		"MOFFEINHAULERBODY_SUBTITLE" : "Hauler",
 		"MOFFEINHAULERBODY_OUTRO_FLAVOR" : "..and so it left, hauled away in a spaceship.",
-		"MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR" : "..and so it vanished, .",
+		"MOFFEINHAULERBODY_MAIN_ENDING_ESCAPE_FAILURE_FLAVOR" : "..and so it vanished, with its third DUI.",
 		
 		"MOFFEINHAULERBODY_SKIN_GEEP_NAME" : "Geep",
 	}
