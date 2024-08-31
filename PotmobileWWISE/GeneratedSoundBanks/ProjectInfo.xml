@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectInfo>
+	<Project Name="PotmobileWWISE" GUID="{FE563F81-9E7E-4F08-907C-5B626827C4CD}" Generator="2023.1.4.8496"/>
+	<CacheRoot>../.cache</CacheRoot>
+	<Platforms>
+		<Platform Name="Windows" GUID="{C8C96BA0-3739-48F5-992A-B849FACABD50}" BasePlatform="Windows" BasePlatformGUID="{6E0CB257-C6C8-4C5C-8366-2740DFC441EB}" Path="Windows"/>
+	</Platforms>
+	<Languages>
+		<Language Name="English(US)" Id="684519430" GUID="{117B5C86-6332-413A-A8A8-F02739947157}" Default="true" UseAsStandIn="true"/>
+	</Languages>
+	<FileHash>{C0C83A25-E8B0-A657-F40F-6E45DC7EE0F4}</FileHash>
+</ProjectInfo>

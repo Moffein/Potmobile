@@ -5,5 +5,5 @@ Game Parameter	ID	Name			Wwise Object Path	Notes
 	3673881719	Volume_SFX			\Default Work Unit\Volume_SFX	
 
 In Memory Audio	ID	Name	Audio source file		Wwise Object Path	Notes	Data Size
-	777582026	carhorn	C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\.cache\Windows\SFX\carhorn_10C4C929.wem		\Actor-Mixer Hierarchy\Default Work Unit\Master Mixer\SFX Mixer\carhorn		98492
+	777582026	carhorn	D:\Projects\RoR2 Mods\Potmobile\PotmobileWWISE\.cache\Windows\SFX\carhorn_818F3B66.wem		\Actor-Mixer Hierarchy\Default Work Unit\Master Mixer\SFX Mixer\carhorn		98524
 

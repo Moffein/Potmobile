@@ -1,38 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SoundBanksInfo Platform="Windows" BasePlatform="Windows" SchemaVersion="12" SoundbankVersion="135">
+<SoundBanksInfo Platform="Windows" BasePlatform="Windows" SchemaVersion="16" SoundBankVersion="150">
 	<RootPaths>
-		<ProjectRoot>C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\</ProjectRoot>
-		<SourceFilesRoot>C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\.cache\Windows\</SourceFilesRoot>
-		<SoundBanksRoot>C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\GeneratedSoundBanks\Windows\</SoundBanksRoot>
+		<ProjectRoot>../..</ProjectRoot>
+		<SourceFilesRoot>../../.cache/Windows</SourceFilesRoot>
+		<SoundBanksRoot>.</SoundBanksRoot>
 		<ExternalSourcesInputFile></ExternalSourcesInputFile>
-		<ExternalSourcesOutputRoot>C:\Users\Node\RoR2 Mods\Potmobile\PotmobileWWISE\GeneratedSoundBanks\Windows</ExternalSourcesOutputRoot>
+		<ExternalSourcesOutputRoot>.</ExternalSourcesOutputRoot>
 	</RootPaths>
 	<DialogueEvents/>
-	<StreamedFiles/>
-	<MediaFilesNotInAnyBank/>
 	<SoundBanks>
-		<SoundBank Id="1355168291" Language="SFX" Hash="263542888">
-			<ObjectPath>Init</ObjectPath>
+		<SoundBank Id="1355168291" Type="User" Language="SFX" Hash="{7F3A15DD-340D-EF22-59CE-AC32EA50B08A}">
 			<ShortName>Init</ShortName>
 			<Path>Init.bnk</Path>
+			<Plugins>
+				<AudioDevices>
+					<Plugin Id="2317455096" Name="No_Output" LibName="No Output" LibId="11862023"/>
+					<Plugin Id="3859886410" Name="System" LibName="System" LibId="11403271"/>
+				</AudioDevices>
+			</Plugins>
+			<Busses>
+				<Bus Id="3803692087" Name="Master Audio Bus"/>
+			</Busses>
+			<GameParameters>
+				<GameParameter Id="3673881719" Name="Volume_SFX"/>
+			</GameParameters>
 		</SoundBank>
-		<SoundBank Id="1508999413" Language="SFX" Hash="2655303812">
-			<ObjectPath>\SoundBanks\Default Work Unit\MoffeinPotmobileSoundbank</ObjectPath>
+		<SoundBank Id="1508999413" Type="User" Language="SFX" Hash="{D75A7CAE-B849-D109-9757-84A7C69BD5EF}">
 			<ShortName>MoffeinPotmobileSoundbank</ShortName>
 			<Path>MoffeinPotmobileSoundbank.bnk</Path>
-			<IncludedEvents>
-				<Event Id="310789011" Name="Play_MoffeinPotmobile_Horn" ObjectPath="\Events\Default Work Unit\Play_MoffeinPotmobile_Horn">
-					<IncludedMemoryFiles>
-						<File Id="777582026" Language="SFX">
-							<ShortName>carhorn.wav</ShortName>
-							<Path>SFX\carhorn_10C4C929.wem</Path>
-						</File>
-					</IncludedMemoryFiles>
+			<Media>
+				<File Id="777582026" Language="SFX" Streaming="false" Location="Memory">
+					<ShortName>carhorn.wav</ShortName>
+					<CachePath>SFX/carhorn_818F3B66.wem</CachePath>
+				</File>
+			</Media>
+			<Events>
+				<Event Id="310789011" Name="Play_MoffeinPotmobile_Horn">
+					<MediaRefs>
+						<MediaRef Id="777582026"/>
+					</MediaRefs>
 				</Event>
-			</IncludedEvents>
+			</Events>
 			<GameParameters>
-				<GameParameter Id="3673881719" Name="Volume_SFX" ObjectPath="\Game Parameters\Default Work Unit\Volume_SFX"/>
+				<GameParameter Id="3673881719" Name="Volume_SFX"/>
 			</GameParameters>
 		</SoundBank>
 	</SoundBanks>
+	<FileHash>{CA116AF7-5526-F97E-5175-81BAC099BCF1}</FileHash>
 </SoundBanksInfo>

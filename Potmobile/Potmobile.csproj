@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +10,21 @@
     </Reference>
     <Reference Include="0Harmony20">
       <HintPath>libs\BepInEx\0Harmony20.dll</HintPath>
+    </Reference>
+    <Reference Include="Ak.Wwise.Api.WAAPI">
+      <HintPath>libs\Ak.Wwise.Api.WAAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="AK.Wwise.Unity.API">
+      <HintPath>libs\AK.Wwise.Unity.API.dll</HintPath>
+    </Reference>
+    <Reference Include="AK.Wwise.Unity.API.WwiseTypes">
+      <HintPath>libs\AK.Wwise.Unity.API.WwiseTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="AK.Wwise.Unity.MonoBehaviour">
+      <HintPath>libs\AK.Wwise.Unity.MonoBehaviour.dll</HintPath>
+    </Reference>
+    <Reference Include="AK.Wwise.Unity.Timeline">
+      <HintPath>libs\AK.Wwise.Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="AncientScepter">
       <HintPath>libs\SoftDependencies\AncientScepter.dll</HintPath>
@@ -80,8 +95,35 @@
     <Reference Include="MonoMod.Utils">
       <HintPath>libs\BepInEx\MonoMod.Utils.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>libs\BepInEx\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="R2API">
       <HintPath>libs\R2API\R2API.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API.Core">
+      <HintPath>libs\R2API\R2API.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API.DamageType">
+      <HintPath>libs\R2API\R2API.DamageType.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API.Director">
+      <HintPath>libs\R2API\R2API.Director.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API.Loadout">
+      <HintPath>libs\R2API\R2API.Loadout.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API.Prefab">
+      <HintPath>libs\R2API\R2API.Prefab.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API.RecalculateStats">
+      <HintPath>libs\R2API\R2API.RecalculateStats.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API.Skins">
+      <HintPath>libs\R2API\R2API.Skins.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API.Sound">
+      <HintPath>libs\R2API\R2API.Sound.dll</HintPath>
     </Reference>
     <Reference Include="Rewired_CSharp">
       <HintPath>libs\Rewired_CSharp.dll</HintPath>

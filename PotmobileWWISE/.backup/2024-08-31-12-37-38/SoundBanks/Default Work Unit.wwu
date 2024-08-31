@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{22B66745-A8E0-40C5-AC1E-3716F193CA46}" SchemaVersion="97">
+	<SoundBanks>
+		<WorkUnit Name="Default Work Unit" ID="{22B66745-A8E0-40C5-AC1E-3716F193CA46}" PersistMode="Standalone">
+			<ChildrenList>
+				<SoundBank Name="MoffeinPotmobileSoundbank" ID="{97C0BC05-0918-4857-AB62-9C809C6765FE}">
+					<ObjectInclusionList>
+						<ObjectRef Name="Play_MoffeinPotmobile_Horn" ID="{745C559F-3046-4227-940B-8EF1EC9D1405}" WorkUnitID="{99191787-2257-48EF-9413-32F1641C5FE2}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
+					<ObjectExclusionList/>
+					<GameSyncExclusionList/>
+				</SoundBank>
+			</ChildrenList>
+		</WorkUnit>
+	</SoundBanks>
+</WwiseDocument>

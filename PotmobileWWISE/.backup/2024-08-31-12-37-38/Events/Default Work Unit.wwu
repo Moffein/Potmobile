@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{99191787-2257-48EF-9413-32F1641C5FE2}" SchemaVersion="97">
+	<Events>
+		<WorkUnit Name="Default Work Unit" ID="{99191787-2257-48EF-9413-32F1641C5FE2}" PersistMode="Standalone">
+			<ChildrenList>
+				<Event Name="Play_MoffeinPotmobile_Horn" ID="{745C559F-3046-4227-940B-8EF1EC9D1405}">
+					<ChildrenList>
+						<Action Name="" ID="{920CF3E9-8160-47AC-875E-7A006D9C605F}" ShortID="552666206">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="carhorn" ID="{61AAF679-DA72-4494-9ECE-00C2AEB9CA4F}" WorkUnitID="{6EED9384-2220-49AF-8CA8-A55F26194665}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
+	</Events>
+</WwiseDocument>

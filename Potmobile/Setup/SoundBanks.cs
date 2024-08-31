@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using R2API;
+using System.IO;
 
 namespace Potmobile
 {
@@ -10,9 +11,14 @@ namespace Potmobile
         {
             if (initialized) return;
             initialized = true;
-            AKRESULT akResult = AkSoundEngine.AddBasePath(Files.assemblyDir);
 
-            AkSoundEngine.LoadBank("MoffeinPotmobileSoundbank.bnk", out _);
+            using (Stream manifestResourceStream = new FileStream(Files.assemblyDir + "\\MoffeinPotmobileSoundbank.bnk", FileMode.Open))
+            {
+
+                byte[] array = new byte[manifestResourceStream.Length];
+                manifestResourceStream.Read(array, 0, array.Length);
+                SoundAPI.SoundBanks.Add(array);
+            }
         }
     }
 }
