@@ -28,7 +28,7 @@ namespace Potmobile
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.Mico27.RideMeExtended", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.4.12")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.4.13")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
      public class PotmobilePlugin : BaseUnityPlugin
     {
@@ -93,6 +93,13 @@ namespace Potmobile
 
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
+            On.RoR2.HoverVehicleMotor.UpdateWheelParameter += FixNullref;
+        }
+
+        private void FixNullref(On.RoR2.HoverVehicleMotor.orig_UpdateWheelParameter orig, HoverVehicleMotor self, HoverEngine wheel, int wheelLateralAxis, HoverVehicleMotor.WheelLongitudinalAxis wheelLongitudinalAxis)
+        {
+            if (!wheel || !wheel.transform) return;
+            orig(self, wheel, wheelLateralAxis, wheelLongitudinalAxis);
         }
 
         private void ReadConfig()
