@@ -42,6 +42,7 @@ namespace Potmobile
 
             ProjectileDamage pd = projectilePrefab.GetComponent<ProjectileDamage>();
             pd.damageType = DamageType.ClayGoo;
+            pd.damageType.damageSource = DamageSource.Primary;
 
             PotmobileContent.projectilePrefabs.Add(projectilePrefab);
             return projectilePrefab;
