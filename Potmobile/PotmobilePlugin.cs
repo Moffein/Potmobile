@@ -28,7 +28,7 @@ namespace Potmobile
     [BepInDependency("com.ThinkInvisible.ClassicItems", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.Mico27.RideMeExtended", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.4.15")]
+    [BepInPlugin("com.Moffein.Potmobile", "Potmobile", "1.4.16")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
      public class PotmobilePlugin : BaseUnityPlugin
     {
@@ -93,7 +93,7 @@ namespace Potmobile
 
             RoR2.ContentManagement.ContentManager.collectContentPackProviders += ContentManager_collectContentPackProviders;
             RoR2.RoR2Application.onLoad += LateSetup;
-            On.RoR2.HoverVehicleMotor.UpdateWheelParameter += FixUpdateWheelParameter;
+            On.RoR2.HoverVehicleMotor.UpdateWheelParameter += HoverVehicleMotor_UpdateWheelParameter;
             On.RoR2.HoverVehicleMotor.ApplyWheelForces += FixApplyWheelForces;
         }
 
@@ -103,7 +103,7 @@ namespace Potmobile
             orig(self, wheel, gas, driveWheel, slidingWheelTractionCurve);
         }
 
-        private void FixUpdateWheelParameter(On.RoR2.HoverVehicleMotor.orig_UpdateWheelParameter orig, HoverVehicleMotor self, HoverEngine wheel, int wheelLateralAxis, HoverVehicleMotor.WheelLongitudinalAxis wheelLongitudinalAxis)
+        private void HoverVehicleMotor_UpdateWheelParameter(On.RoR2.HoverVehicleMotor.orig_UpdateWheelParameter orig, HoverVehicleMotor self, HoverEngine wheel, HoverVehicleMotor.WheelLateralAxis wheelLateralAxis, HoverVehicleMotor.WheelLongitudinalAxis wheelLongitudinalAxis)
         {
             if (!wheel || !wheel.transform) return;
             orig(self, wheel, wheelLateralAxis, wheelLongitudinalAxis);

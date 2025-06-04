@@ -36,10 +36,11 @@ namespace Potmobile.Survivors.Hauler
             On.RoR2.SkinCatalog.Init += SkinCatalog_Init;
         }
 
-        private void SkinCatalog_Init(On.RoR2.SkinCatalog.orig_Init orig)
+        private System.Collections.IEnumerator SkinCatalog_Init(On.RoR2.SkinCatalog.orig_Init orig)
         {
-            orig();
+            var toReturn = orig();
             CreateHaulerDisplayObject();
+            return toReturn;
         }
 
         private void GhostUtilitySkillState_FixedUpdate(On.EntityStates.GhostUtilitySkillState.orig_FixedUpdate orig, GhostUtilitySkillState self)
